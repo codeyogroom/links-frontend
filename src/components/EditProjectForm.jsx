@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronUp, ChevronDown, Monitor, Smartphone, Tablet, RefreshCw, FileText, Link as LinkIcon, AlertCircle, PlayCircle, Shield, ShieldAlert, CheckSquare, X, Copy, Check, Mail } from 'lucide-react';
+import { ChevronUp, ChevronDown, Monitor, Smartphone, Tablet, RefreshCw, FileText, Link as LinkIcon, AlertCircle, PlayCircle, Shield, ShieldAlert, ShieldCheck, CheckSquare, X, Copy, Check, Mail, Activity } from 'lucide-react';
 import api from '../api';
 import { COUNTRIES } from '../utils/countries';
 import { LANGUAGES } from '../utils/languages';

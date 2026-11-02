@@ -51,9 +51,6 @@ function Navbar({ setAuth }) {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-base font-bold tracking-tight text-slate-900">Talk To Panel</span>
-                <span className="hidden xl:inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/60">
-                  v2.5
-                </span>
               </div>
             </Link>
 

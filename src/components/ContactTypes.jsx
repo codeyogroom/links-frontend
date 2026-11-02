@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 import api from '../api';
 import Loader from './Loader';
@@ -21,8 +21,11 @@ function ContactTypes() {
       setLoading(true);
       const res = await api.get('/admin/contact-types');
       setTypes(res.data);
+    } catch(err) {
+      console.error(err);
+    } finally {
       setLoading(false);
-    } catch(err) { console.error(err); }
+    }
   };
 
   const openAddModal = () => {

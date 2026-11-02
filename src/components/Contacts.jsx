@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Edit, Trash2, Save } from 'lucide-react';
 import api from '../api';
 import Loader from './Loader';
@@ -52,10 +52,15 @@ function Contacts() {
   }, []);
 
   const fetchContacts = async () => {
-    try { setLoading(true);
-      const res = await api.get('/admin/contacts'); setContacts(res.data);
-      setLoading(false); }
-    catch(err) { console.error(err); }
+    try {
+      setLoading(true);
+      const res = await api.get('/admin/contacts');
+      setContacts(res.data);
+    } catch(err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchContactTypes = async () => {

@@ -52,8 +52,11 @@ function Companies() {
       setLoading(true);
       const res = await api.get('/admin/companies');
       setCompanies(res.data);
+    } catch(err) {
+      console.error(err);
+    } finally {
       setLoading(false);
-    } catch(err) { console.error(err); }
+    }
   };
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));

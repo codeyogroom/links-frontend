@@ -77,10 +77,16 @@ function Contacts() {
     if (!form.firstName) return alert('First Name is required');
     if (!form.email) return alert('Email Address is required');
     try {
+      const payload = {
+        ...form,
+        contactTypeId: form.contactTypeId || null,
+        companyId: form.companyId || null,
+        dateOfBirth: form.dateOfBirth || null
+      };
       if (editId) {
-        await api.put(`/admin/contacts/${editId}`, form);
+        await api.put(`/admin/contacts/${editId}`, payload);
       } else {
-        await api.post('/admin/contacts', form);
+        await api.post('/admin/contacts', payload);
       }
       setForm(emptyForm);
       setEditId(null);

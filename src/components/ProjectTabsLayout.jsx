@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import api from '../api';
@@ -55,9 +55,9 @@ function ProjectTabsLayout() {
       {/* Blue Project Header */}
       <div className="bg-[#4b8df8] text-white p-3 flex justify-between items-center shadow-sm">
         <h2 className="text-sm font-bold flex items-center">
-            Project (# 1403 :: P-0) <span className="underline ml-1 uppercase">{project?.name || 'Loading...'}</span>
+          Project (#{project?.projectId || id?.slice(-4)} :: P-{project?.parentProjectId ? (project.parentProjectId._id ? project.parentProjectId._id.slice(-4) : project.parentProjectId.toString().slice(-4)) : '0'}) <span className="underline ml-1 uppercase">{project?.name || ''}</span>
         </h2>
-        <RefreshCw size={16} className="cursor-pointer hover:text-gray-200" />
+        <RefreshCw size={16} className="cursor-pointer hover:text-gray-200 transition" onClick={() => window.location.reload()} />
       </div>
 
       {/* Main Content Area */}

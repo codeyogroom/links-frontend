@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Loader from './components/Loader';
@@ -29,7 +29,7 @@ function Layout({ children, setAuth }) {
         {children}
       </div>
       <footer className="bg-white border-t p-4 flex justify-between text-xs text-gray-500 font-medium">
-        <span>Copyright Â© 2026 Talk To Panel.</span>
+        <span>Copyright &copy; 2026 Talk To Panel.</span>
         <span>Powered By : veritasInsights</span>
       </footer>
     </div>

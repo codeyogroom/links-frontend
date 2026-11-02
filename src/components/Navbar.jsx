@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, Menu, X, ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -21,7 +21,7 @@ function Navbar({ setAuth }) {
   };
 
   return (
-    <nav className="relative z-50 bg-white border-b border-gray-200 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
@@ -82,10 +82,9 @@ function Navbar({ setAuth }) {
                 <button className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-blue-600 hover:bg-blue-50 focus:outline-none transition-colors">
                   Analysis <ChevronDown size={14} className="ml-1.5 text-gray-400 group-hover:text-blue-500 transition-colors" />
                 </button>
-                <div className="absolute left-0 z-50 hidden w-48 mt-1 origin-top-left bg-white border border-gray-100 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 group-hover:block">
+                <div className="absolute left-0 z-50 hidden w-44 mt-1 origin-top-left bg-white border border-gray-100 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 group-hover:block">
                   <div className="py-1">
                     <Link to="/analysis/reports" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Reports</Link>
-                    <Link to="/analytics" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">Analytics Logs</Link>
                   </div>
                 </div>
               </div>
@@ -153,7 +152,6 @@ function Navbar({ setAuth }) {
             {mobileDropdown === 'analysis' && (
               <div className="pl-6 space-y-1 pb-2">
                  <Link to="/analysis/reports" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setMobileMenuOpen(false)}>Reports</Link>
-                 <Link to="/analytics" className="block px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors" onClick={() => setMobileMenuOpen(false)}>Analytics Logs</Link>
               </div>
             )}
             

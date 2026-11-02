@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronUp, ChevronDown, Monitor, Smartphone, Tablet, RefreshCw, FileText, Link as LinkIcon, AlertCircle, PlayCircle, Shield, ShieldAlert, CheckSquare, X, Copy, Check } from 'lucide-react';
 import api from '../api';
@@ -46,8 +46,9 @@ function EditProjectForm() {
     avgLoi: 0, medianLoi: 0, abandons: 0, lastCompleted: '-'
   });
 
-  // End Pages Modal State
+  // End Pages & Link Codes Modal State
   const [showEndPagesModal, setShowEndPagesModal] = useState(false);
+  const [showLinkCodesModal, setShowLinkCodesModal] = useState(false);
   const [copiedKey, setCopiedKey] = useState(null);
 
   const serverBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1').replace(/\/api\/v1\/?$/, '');
@@ -161,7 +162,7 @@ function EditProjectForm() {
       <div className="bg-white border-b px-4 py-3 flex items-center justify-between text-xs shadow-sm mb-4">
          <div className="flex space-x-2">
             <button onClick={() => setShowEndPagesModal(true)} className="bg-[#4eb3f7] hover:bg-blue-400 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><FileText size={14} className="mr-1"/> End Pages</button>
-            <button className="bg-[#128a8a] hover:bg-teal-600 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><LinkIcon size={14} className="mr-1"/> Link Codes</button>
+            <button onClick={() => setShowLinkCodesModal(true)} className="bg-[#128a8a] hover:bg-teal-600 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><LinkIcon size={14} className="mr-1"/> Link Codes</button>
             <button className="bg-[#5c6e80] hover:bg-gray-600 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><AlertCircle size={14} className="mr-1"/> Redirect Status ID(s)</button>
             <button className="bg-[#ff8a65] hover:bg-orange-500 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><PlayCircle size={14} className="mr-1"/> rrg</button>
          </div>
@@ -625,6 +626,171 @@ function EditProjectForm() {
             <div className="bg-gray-50 px-6 py-3 border-t flex justify-end">
               <button 
                 onClick={() => setShowEndPagesModal(false)}
+                className="bg-[#00b5ad] hover:bg-teal-600 text-white font-bold text-xs px-5 py-2 rounded shadow-sm transition"
+              >
+                Okay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Link Codes Modal */}
+      {showLinkCodesModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-200">
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
+              <h3 className="text-base font-bold text-gray-800">Redirect End Pages & Variables</h3>
+              <button 
+                className="text-gray-400 hover:text-gray-700 transition" 
+                onClick={() => setShowLinkCodesModal(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 text-xs">
+              {/* Left Column: Client Link Variable */}
+              <div>
+                <h4 className="text-xl font-bold text-gray-900 mb-2">Client Link Variable</h4>
+                <p className="text-gray-600 mb-2 leading-relaxed">
+                  These variables shall be used only in client survey link.The values of the variable shall be replaced in begin pages and then passed to client survey link url.
+                </p>
+                <p className="font-semibold text-red-500 mb-4">
+                  These variables are case sensitive
+                </p>
+
+                <div className="border rounded overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <tbody>
+                      <tr className="border-b">
+                        <td className="p-2.5 font-bold text-gray-800 w-1/3">ClientCode</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{CLIENTKEY}}`}</span>
+                          <button onClick={() => copyToClipboard('{{CLIENTKEY}}', 'lc1')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lc1' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="border-b bg-gray-50/50">
+                        <td className="p-2.5 font-bold text-gray-800">ID</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{ID}}`}</span>
+                          <button onClick={() => copyToClipboard('{{ID}}', 'lc2')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lc2' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="p-2.5 font-bold text-gray-800">Ext</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{PASSTHRU}}`}</span>
+                          <button onClick={() => copyToClipboard('{{PASSTHRU}}', 'lc3')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lc3' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="border-b bg-gray-50/50">
+                        <td className="p-2.5 font-bold text-gray-800">Re Connect ID</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{RECONNECTID}}`}</span>
+                          <button onClick={() => copyToClipboard('{{RECONNECTID}}', 'lc4')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lc4' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="p-2.5 font-bold text-gray-800">Zip</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{Zip}}`}</span>
+                          <button onClick={() => copyToClipboard('{{Zip}}', 'lc5')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lc5' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="border-b bg-gray-50/50">
+                        <td className="p-2.5 font-bold text-gray-800">Age</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{Age}}`}</span>
+                          <button onClick={() => copyToClipboard('{{Age}}', 'lc6')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lc6' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="p-2.5 font-bold text-gray-800">Gender</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{Gender}}`}</span>
+                          <button onClick={() => copyToClipboard('{{Gender}}', 'lc7')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lc7' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2.5 font-bold text-gray-800">authToken</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{authToken}}`}</span>
+                          <button onClick={() => copyToClipboard('{{authToken}}', 'lc8')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lc8' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Right Column: Vendor Link Variable */}
+              <div>
+                <h4 className="text-xl font-bold text-gray-900 mb-2">Vendor Link Variable</h4>
+                <p className="text-gray-600 mb-2 leading-relaxed">
+                  These variables shall be used only with vendor endpages.The values shall be replaced in end pages and then passed to vendor end pages.
+                </p>
+                <p className="font-semibold text-red-500 mb-4">
+                  These variables are case sensitive
+                </p>
+
+                <div className="border rounded overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <tbody>
+                      <tr className="border-b">
+                        <td className="p-2.5 font-bold text-gray-800 w-1/3">Ext</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{PASSTHRU}}`}</span>
+                          <button onClick={() => copyToClipboard('{{PASSTHRU}}', 'lv1')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lv1' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr className="border-b bg-gray-50/50">
+                        <td className="p-2.5 font-bold text-gray-800">Re Connect ID</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{RECONNECTID}}`}</span>
+                          <button onClick={() => copyToClipboard('{{RECONNECTID}}', 'lv2')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lv2' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2.5 font-bold text-gray-800">Panellist ID</td>
+                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                          <span>{`{{panellist_id}}`}</span>
+                          <button onClick={() => copyToClipboard('{{panellist_id}}', 'lv3')} className="text-gray-400 hover:text-blue-600">
+                            {copiedKey === 'lv3' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 px-6 py-3 border-t flex justify-end">
+              <button 
+                onClick={() => setShowLinkCodesModal(false)}
                 className="bg-[#00b5ad] hover:bg-teal-600 text-white font-bold text-xs px-5 py-2 rounded shadow-sm transition"
               >
                 Okay

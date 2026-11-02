@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import Loader from './Loader';
-import { Edit } from 'lucide-react';
+import { Edit, ChevronLeft, ChevronRight } from 'lucide-react';
 
 function Projects() {
   const [projects, setProjects] = useState([]);
@@ -117,9 +117,9 @@ function Projects() {
       <div className="flex justify-between items-center mt-3 text-xs text-gray-500">
         <span>Showing 1 to {projects.length || 0} of {projects.length || 0} entries</span>
         <div className="flex space-x-1">
-           <button className="px-2 py-1 bg-gray-100 rounded border">Â«</button>
-           <button className="px-2 py-1 bg-blue-500 text-white rounded border">1</button>
-           <button className="px-2 py-1 bg-gray-100 rounded border">Â»</button>
+           <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded border flex items-center text-gray-600"><ChevronLeft size={14} /></button>
+           <button className="px-2.5 py-1 bg-blue-500 text-white rounded border font-medium">1</button>
+           <button className="px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded border flex items-center text-gray-600"><ChevronRight size={14} /></button>
         </div>
       </div>
     </div>
@@ -127,4 +127,5 @@ function Projects() {
 }
 
 export default Projects;
+
 

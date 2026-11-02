@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronUp, ChevronDown, Monitor, Smartphone, Tablet, RefreshCw, FileText, Link as LinkIcon, AlertCircle, PlayCircle, Shield, ShieldAlert, CheckSquare } from 'lucide-react';
 import api from '../api';
@@ -37,6 +37,7 @@ function EditProjectForm() {
   // Dropdown options
   const [studyTypes, setStudyTypes] = useState([]);
   const [clients, setClients] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
 
   // Project Stats State
   const [stats, setStats] = useState({
@@ -51,12 +52,14 @@ function EditProjectForm() {
   useEffect(() => {
     const fetchConfigs = async () => {
       try {
-        const [stRes, compRes] = await Promise.all([
+        const [stRes, compRes, projRes] = await Promise.all([
           api.get('/admin/study-types'),
-          api.get('/admin/companies')
+          api.get('/admin/companies'),
+          api.get('/admin/projects')
         ]);
         setStudyTypes(stRes.data);
         setClients(compRes.data);
+        setAllProjects(projRes.data);
       } catch (e) {
         console.error("Error fetching configs", e);
       }
@@ -164,7 +167,7 @@ function EditProjectForm() {
                 <div className="p-4 space-y-4 text-xs">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div><label className="block text-gray-600 mb-1">Project Name</label><input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                    <div><label className="block text-gray-600 mb-1">Parent Project</label><select name="parentProjectId" value={formData.parentProjectId} onChange={handleChange} className="w-full border p-2 rounded"><option value="">Self Parent</option></select></div>
+                    <div><label className="block text-gray-600 mb-1">Parent Project</label><select name="parentProjectId" value={formData.parentProjectId} onChange={handleChange} className="w-full border p-2 rounded"><option value="">Self Parent</option>{allProjects.filter(p => p._id !== id).map(p => <option key={p._id} value={p._id}>{p.name}</option>)}</select></div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronUp, ChevronDown, Monitor, Smartphone, Tablet, Save } from 'lucide-react';
 import api from '../api';
@@ -43,16 +43,19 @@ function AddProjectForm() {
   // Dropdown options from API
   const [studyTypes, setStudyTypes] = useState([]);
   const [clients, setClients] = useState([]);
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     const fetchConfigs = async () => {
       try {
-        const [stRes, compRes] = await Promise.all([
+        const [stRes, compRes, projRes] = await Promise.all([
           api.get('/admin/study-types'),
-          api.get('/admin/companies')
+          api.get('/admin/companies'),
+          api.get('/admin/projects')
         ]);
         setStudyTypes(stRes.data);
         setClients(compRes.data);
+        setProjects(projRes.data);
       } catch (e) {
         console.error("Error fetching configs", e);
       }
@@ -122,6 +125,9 @@ function AddProjectForm() {
                     <label className="block text-gray-600 mb-1">Parent Project</label>
                     <select name="parentProjectId" value={formData.parentProjectId} onChange={handleChange} className="w-full border p-2 rounded focus:outline-none focus:border-blue-500">
                       <option value="">Self Parent</option>
+                      {projects.map(p => (
+                        <option key={p._id} value={p._id}>{p.name}</option>
+                      ))}
                     </select>
                   </div>
                 </div>

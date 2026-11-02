@@ -51,6 +51,7 @@ function EditProjectForm() {
   const [showEndPagesModal, setShowEndPagesModal] = useState(false);
   const [showLinkCodesModal, setShowLinkCodesModal] = useState(false);
   const [showRedirectStatusModal, setShowRedirectStatusModal] = useState(false);
+  const [showRfqModal, setShowRfqModal] = useState(false);
   const [copiedKey, setCopiedKey] = useState(null);
 
   const serverBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1').replace(/\/api\/v1\/?$/, '');
@@ -189,6 +190,7 @@ function EditProjectForm() {
               <AlertCircle size={14} className="mr-1.5"/> Redirect Status ID(s)
             </button>
             <button 
+              onClick={() => setShowRfqModal(true)}
               className="bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center shadow-xs transition-all"
             >
               <Mail size={14} className="mr-1.5"/> RFQ
@@ -965,6 +967,65 @@ function EditProjectForm() {
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RFQ (Request For Quotation) Modal */}
+      {showRfqModal && (
+        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto border border-slate-200/80">
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+              <div className="flex items-center space-x-2">
+                <Mail size={18} className="text-amber-500" />
+                <h3 className="text-base font-bold text-slate-900">RFQ - Request For Quotation Brief</h3>
+              </div>
+              <button 
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg transition" 
+                onClick={() => setShowRfqModal(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 text-xs text-slate-700 space-y-4">
+              <p className="text-slate-500 leading-relaxed">
+                Use this specification brief to request quotes and feasibility confirmation from panel suppliers and vendors.
+              </p>
+
+              <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4 font-mono text-[11px] space-y-1.5 text-slate-800">
+                <p><strong>Project:</strong> {formData.name || 'N/A'} (ID: #{id})</p>
+                <p><strong>Country:</strong> {Array.isArray(formData.country) ? formData.country.join(', ') : (formData.country || 'Any')}</p>
+                <p><strong>Language:</strong> {formData.language || 'English'}</p>
+                <p><strong>Target Completes (N):</strong> {formData.reqCompletes || 100}</p>
+                <p><strong>Length of Interview (LOI):</strong> {formData.loi || '10'} minutes</p>
+                <p><strong>Incidence Rate (IR):</strong> {formData.ir || 100}%</p>
+                <p><strong>Vendor Max CPC:</strong> ${Number(formData.vendorMaxCpc || 0).toFixed(2)} USD</p>
+                <p><strong>Devices:</strong> {Object.keys(formData.supportedDevices).filter(k => formData.supportedDevices[k]).join(', ') || 'All'}</p>
+                {formData.projectBrief && <p className="pt-2 border-t border-slate-200"><strong>Audience Brief:</strong> {formData.projectBrief}</p>}
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  onClick={() => {
+                    const briefText = `PROJECT RFQ SPECIFICATIONS\n--------------------------\nProject: ${formData.name} (#${id})\nCountry: ${Array.isArray(formData.country) ? formData.country.join(', ') : formData.country}\nLanguage: ${formData.language}\nTarget Completes (N): ${formData.reqCompletes}\nLOI: ${formData.loi} mins\nExpected IR: ${formData.ir}%\nVendor Max CPC: $${Number(formData.vendorMaxCpc || 0).toFixed(2)}\nDevices: ${Object.keys(formData.supportedDevices).filter(k => formData.supportedDevices[k]).join(', ')}\nBrief: ${formData.projectBrief || 'N/A'}`;
+                    copyToClipboard(briefText, 'rfq-copy');
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl flex items-center shadow-xs transition"
+                >
+                  {copiedKey === 'rfq-copy' ? <Check size={14} className="mr-1.5 text-emerald-300" /> : <Copy size={14} className="mr-1.5" />}
+                  {copiedKey === 'rfq-copy' ? 'Copied to Clipboard!' : 'Copy RFQ Brief'}
+                </button>
+                <button
+                  onClick={() => setShowRfqModal(false)}
+                  className="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold transition"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

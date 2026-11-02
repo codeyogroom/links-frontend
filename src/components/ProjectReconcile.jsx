@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { Upload, CheckCircle2, RefreshCw, AlertTriangle, GitCompare, FileSpreadsheet } from 'lucide-react';
+import api from '../api';
 
 function ProjectReconcile() {
   const { id } = useParams();
@@ -32,21 +33,48 @@ function ProjectReconcile() {
   const handleUploadReconcile = async () => {
     if (!file) return alert('Please select a reconciliation CSV/Excel file.');
     setReconciling(true);
-    try {
-      setTimeout(() => {
-        setReconcileResult({
-          totalProcessed: 24,
-          approved: 22,
-          rejected: 2,
-          message: 'Reconciliation process completed successfully.'
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        if (lines.length === 0) {
+          alert('File is empty.');
+          setReconciling(false);
+          return;
+        }
+
+        // Parse CSV lines into items [{ ttpid, status_id }]
+        const items = [];
+        lines.forEach((line, index) => {
+          // Skip header if line starts with TTPID or Session
+          if (index === 0 && (line.toLowerCase().includes('ttpid') || line.toLowerCase().includes('status'))) {
+            return;
+          }
+          const parts = line.split(/[,;\t]/).map(p => p.trim().replace(/^["']|["']$/g, ''));
+          if (parts.length >= 2) {
+            items.push({ ttpid: parts[0], status_id: parts[1] });
+          } else if (parts.length === 1 && parts[0]) {
+            items.push({ ttpid: parts[0], status_id: '6' }); // Default to complete if only ID provided
+          }
         });
+
+        if (items.length === 0) {
+          alert('No valid TTPID entries found in file.');
+          setReconciling(false);
+          return;
+        }
+
+        const res = await api.post(`/admin/projects/${id}/reconcile`, { items });
+        setReconcileResult(res.data);
+      } catch (err) {
+        console.error(err);
+        alert('Error processing reconciliation file: ' + (err.response?.data?.message || err.message));
+      } finally {
         setReconciling(false);
-      }, 1000);
-    } catch (e) {
-      console.error(e);
-      alert('Error processing reconciliation file.');
-      setReconciling(false);
-    }
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (

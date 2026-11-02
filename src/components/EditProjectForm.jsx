@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronUp, ChevronDown, Monitor, Smartphone, Tablet, RefreshCw, FileText, Link as LinkIcon, AlertCircle, PlayCircle, Shield, ShieldAlert, CheckSquare } from 'lucide-react';
+import { ChevronUp, ChevronDown, Monitor, Smartphone, Tablet, RefreshCw, FileText, Link as LinkIcon, AlertCircle, PlayCircle, Shield, ShieldAlert, CheckSquare, X, Copy, Check } from 'lucide-react';
 import api from '../api';
 import { COUNTRIES } from '../utils/countries';
 import { LANGUAGES } from '../utils/languages';
@@ -48,6 +48,26 @@ function EditProjectForm() {
 
   // End Pages Modal State
   const [showEndPagesModal, setShowEndPagesModal] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(null);
+
+  const serverBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1').replace(/\/api\/v1\/?$/, '');
+
+  const getAuthToken = (statusCode, projId) => {
+    let hash = 0;
+    const str = `${statusCode}_${projId || ''}_ttp_salt_2026`;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    const hex = Math.abs(hash).toString(16).padStart(8, '0');
+    return (hex + hex + hex + hex).slice(0, 32);
+  };
+
+  const copyToClipboard = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
 
   useEffect(() => {
     const fetchConfigs = async () => {
@@ -460,34 +480,155 @@ function EditProjectForm() {
 
       </div>
 
-      {/* End Pages Modal */}
+            {/* End Pages Modal */}
       {showEndPagesModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold">Project End Pages (For Client)</h3>
-              <button className="text-gray-500 hover:text-gray-800" onClick={() => setShowEndPagesModal(false)}>âœ•</button>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200">
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
+              <h3 className="text-base font-bold text-gray-800">Redirect End Pages & Variables</h3>
+              <button 
+                className="text-gray-400 hover:text-gray-700 transition" 
+                onClick={() => setShowEndPagesModal(false)}
+              >
+                <X size={18} />
+              </button>
             </div>
-            <p className="text-sm text-gray-600 mb-4">
-              Provide these links to your client. They must append the session tracking ID to the end of the URL (e.g., <code className="bg-gray-100 p-0.5">ttpid=[their_macro]</code>).
-            </p>
-            <div className="space-y-4">
-              <div className="border p-3 rounded">
-                <p className="font-bold text-green-600 mb-1">Success</p>
-                <code className="text-xs break-all block">{`${window.location.protocol}//${window.location.hostname}:5000/api/v1/router/end/success/${id}?ttpid=[TTPID]`}</code>
+
+            <div className="p-6 space-y-6 text-xs">
+              {/* Section 1: End Links */}
+              <div>
+                <h4 className="text-sm font-bold text-gray-800 border-b pb-1 mb-3">End Links</h4>
+                <div className="space-y-3">
+                  <div>
+                    <span className="font-bold text-green-600 block mb-0.5">Complete:</span>
+                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
+                      <code className="text-gray-700 break-all select-all font-mono">
+                        {`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('1', id)}`}
+                      </code>
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('1', id)}`, 'c1')} className="ml-2 text-gray-500 hover:text-blue-600">
+                        {copiedKey === 'c1' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-bold text-red-500 block mb-0.5">Terminate:</span>
+                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
+                      <code className="text-gray-700 break-all select-all font-mono">
+                        {`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('2', id)}`}
+                      </code>
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('2', id)}`, 'c2')} className="ml-2 text-gray-500 hover:text-blue-600">
+                        {copiedKey === 'c2' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-bold text-orange-500 block mb-0.5">Quota Full:</span>
+                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
+                      <code className="text-gray-700 break-all select-all font-mono">
+                        {`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('3', id)}`}
+                      </code>
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('3', id)}`, 'c3')} className="ml-2 text-gray-500 hover:text-blue-600">
+                        {copiedKey === 'c3' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-bold text-red-600 block mb-0.5">Security Term:</span>
+                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
+                      <code className="text-gray-700 break-all select-all font-mono">
+                        {`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('4', id)}`}
+                      </code>
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('4', id)}`, 'c4')} className="ml-2 text-gray-500 hover:text-blue-600">
+                        {copiedKey === 'c4' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="border p-3 rounded">
-                <p className="font-bold text-orange-500 mb-1">Disqualified</p>
-                <code className="text-xs break-all block">{`${window.location.protocol}//${window.location.hostname}:5000/api/v1/router/end/disqualified/${id}?ttpid=[TTPID]`}</code>
+
+              {/* Section 2: S2S Postback Link */}
+              <div>
+                <h4 className="text-sm font-bold text-gray-800 border-b pb-1 mb-3">S2S Postback Link</h4>
+                <div>
+                  <span className="font-bold text-green-600 block mb-0.5">S2S Postback Link:</span>
+                  <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
+                    <code className="text-gray-700 break-all select-all font-mono">
+                      {`${serverBaseUrl}/redirect-postback/?pid=[[TTPID]]&status_id=[[status]]`}
+                    </code>
+                    <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-postback/?pid=[[TTPID]]&status_id=[[status]]`, 's2s')} className="ml-2 text-gray-500 hover:text-blue-600">
+                      {copiedKey === 's2s' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="border p-3 rounded">
-                <p className="font-bold text-yellow-600 mb-1">Quota Full</p>
-                <code className="text-xs break-all block">{`${window.location.protocol}//${window.location.hostname}:5000/api/v1/router/end/quotafull/${id}?ttpid=[TTPID]`}</code>
+
+              {/* Section 3: Static Links */}
+              <div>
+                <h4 className="text-sm font-bold text-gray-800 border-b pb-1 mb-3">Static Links</h4>
+                <div className="space-y-3">
+                  <div>
+                    <span className="font-bold text-green-600 block mb-0.5">Complete:</span>
+                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
+                      <code className="text-gray-700 break-all select-all font-mono">
+                        {`${serverBaseUrl}/redirect-process/?supp_code=55&status=1&pid=[[TTPID]]`}
+                      </code>
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=1&pid=[[TTPID]]`, 'st1')} className="ml-2 text-gray-500 hover:text-blue-600">
+                        {copiedKey === 'st1' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-bold text-red-500 block mb-0.5">Terminate:</span>
+                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
+                      <code className="text-gray-700 break-all select-all font-mono">
+                        {`${serverBaseUrl}/redirect-process/?supp_code=55&status=2&pid=[[TTPID]]`}
+                      </code>
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=2&pid=[[TTPID]]`, 'st2')} className="ml-2 text-gray-500 hover:text-blue-600">
+                        {copiedKey === 'st2' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-bold text-orange-500 block mb-0.5">Quota Full:</span>
+                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
+                      <code className="text-gray-700 break-all select-all font-mono">
+                        {`${serverBaseUrl}/redirect-process/?supp_code=55&status=3&pid=[[TTPID]]`}
+                      </code>
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=3&pid=[[TTPID]]`, 'st3')} className="ml-2 text-gray-500 hover:text-blue-600">
+                        {copiedKey === 'st3' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-bold text-red-600 block mb-0.5">Security Term:</span>
+                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
+                      <code className="text-gray-700 break-all select-all font-mono">
+                        {`${serverBaseUrl}/redirect-process/?supp_code=55&status=4&pid=[[TTPID]]`}
+                      </code>
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=4&pid=[[TTPID]]`, 'st4')} className="ml-2 text-gray-500 hover:text-blue-600">
+                        {copiedKey === 'st4' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="border p-3 rounded">
-                <p className="font-bold text-red-500 mb-1">Security Terminate</p>
-                <code className="text-xs break-all block">{`${window.location.protocol}//${window.location.hostname}:5000/api/v1/router/end/security/${id}?ttpid=[TTPID]`}</code>
-              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 px-6 py-3 border-t flex justify-end">
+              <button 
+                onClick={() => setShowEndPagesModal(false)}
+                className="bg-[#00b5ad] hover:bg-teal-600 text-white font-bold text-xs px-5 py-2 rounded shadow-sm transition"
+              >
+                Okay
+              </button>
             </div>
           </div>
         </div>
@@ -498,5 +639,4 @@ function EditProjectForm() {
 }
 
 export default EditProjectForm;
-
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronUp, ChevronDown, Monitor, Smartphone, Tablet, RefreshCw, FileText, Link as LinkIcon, AlertCircle, PlayCircle, Shield, ShieldAlert, CheckSquare, X, Copy, Check } from 'lucide-react';
+import { ChevronUp, ChevronDown, Monitor, Smartphone, Tablet, RefreshCw, FileText, Link as LinkIcon, AlertCircle, PlayCircle, Shield, ShieldAlert, CheckSquare, X, Copy, Check, Mail } from 'lucide-react';
 import api from '../api';
 import { COUNTRIES } from '../utils/countries';
 import { LANGUAGES } from '../utils/languages';
@@ -49,6 +49,7 @@ function EditProjectForm() {
   // End Pages & Link Codes Modal State
   const [showEndPagesModal, setShowEndPagesModal] = useState(false);
   const [showLinkCodesModal, setShowLinkCodesModal] = useState(false);
+  const [showRedirectStatusModal, setShowRedirectStatusModal] = useState(false);
   const [copiedKey, setCopiedKey] = useState(null);
 
   const serverBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1').replace(/\/api\/v1\/?$/, '');
@@ -163,8 +164,8 @@ function EditProjectForm() {
          <div className="flex space-x-2">
             <button onClick={() => setShowEndPagesModal(true)} className="bg-[#4eb3f7] hover:bg-blue-400 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><FileText size={14} className="mr-1"/> End Pages</button>
             <button onClick={() => setShowLinkCodesModal(true)} className="bg-[#128a8a] hover:bg-teal-600 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><LinkIcon size={14} className="mr-1"/> Link Codes</button>
-            <button className="bg-[#5c6e80] hover:bg-gray-600 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><AlertCircle size={14} className="mr-1"/> Redirect Status ID(s)</button>
-            <button className="bg-[#ff8a65] hover:bg-orange-500 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><PlayCircle size={14} className="mr-1"/> rrg</button>
+            <button onClick={() => setShowRedirectStatusModal(true)} className="bg-[#5c6e80] hover:bg-gray-600 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><AlertCircle size={14} className="mr-1"/> Redirect Status ID(s)</button>
+            <button className="bg-[#ff8a65] hover:bg-orange-500 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><Mail size={14} className="mr-1"/> RFQ</button>
          </div>
          <div className="flex items-center space-x-4">
              <span className="font-bold text-gray-700">True Up :</span>
@@ -794,6 +795,49 @@ function EditProjectForm() {
                 className="bg-[#00b5ad] hover:bg-teal-600 text-white font-bold text-xs px-5 py-2 rounded shadow-sm transition"
               >
                 Okay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Redirect Status ID(s) Modal */}
+      {showRedirectStatusModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-gray-200">
+            {/* Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b">
+              <h3 className="text-base font-bold text-gray-800">Redirect Status ID(s)</h3>
+              <button 
+                className="text-gray-400 hover:text-gray-700 transition" 
+                onClick={() => setShowRedirectStatusModal(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 text-sm text-gray-800 space-y-2 font-normal">
+              <div>6 : Completed</div>
+              <div>7 : Disqualified</div>
+              <div>8 : Quota FULL</div>
+              <div>9 : Redirected</div>
+              <div>10 : Rejected - Failed SECURITY</div>
+              <div>11 : Rejected - Inconsistency</div>
+              <div>12 : Rejected - Poor OPEN ENDS</div>
+              <div>13 : Rejected - Quality issues</div>
+              <div>14 : Rejected - Speeding</div>
+              <div>31 : Rejected - Blank Referrer</div>
+              <div>32 : Rejected - IP Mismatch</div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 px-6 py-3 border-t flex justify-end">
+              <button 
+                onClick={() => setShowRedirectStatusModal(false)}
+                className="bg-[#5c6e80] hover:bg-gray-700 text-white font-bold text-xs px-5 py-2 rounded shadow-sm transition"
+              >
+                Close
               </button>
             </div>
           </div>

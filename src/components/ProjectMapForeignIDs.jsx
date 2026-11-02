@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { KeyRound, Download, FileSpreadsheet } from 'lucide-react';
 import api from '../api';
 
 function ProjectMapForeignIDs() {
@@ -73,7 +74,6 @@ function ProjectMapForeignIDs() {
           status = matchedCode.isUsed ? 'Used' : 'Available';
           date = matchedCode.completedOn || matchedCode.started || date;
         } else {
-          // If not in database, map cleanly with FID_ prefix or clean hex
           foreignId = `FID_${inputKey.replace(/[^a-zA-Z0-9]/g, '').slice(-8) || Math.floor(100000 + Math.random() * 900000)}`;
           status = 'Mapped';
         }
@@ -112,13 +112,17 @@ function ProjectMapForeignIDs() {
   };
 
   return (
-    <div className="bg-white p-6 md:p-8 min-h-[480px]">
-      <h1 className="text-xl font-normal text-gray-900 mb-6">
-        Map <span className="underline underline-offset-2">Redirect IDs</span> to{' '}
-        <span className="underline underline-offset-2">Foreign IDs</span>
-      </h1>
+    <div className="bg-white rounded-2xl border border-slate-200/80 p-6 md:p-8 min-h-[480px] shadow-xs">
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <KeyRound size={20} className="text-blue-600" />
+          Map <span className="text-blue-600 underline underline-offset-4">Redirect IDs</span> to{' '}
+          <span className="text-indigo-600 underline underline-offset-4">Foreign IDs</span>
+        </h1>
+        <p className="text-xs text-slate-500 mt-1">Cross-reference client end-page redirect tokens back to original supplier panellist IDs.</p>
+      </div>
 
-      <label className="block text-xs font-semibold text-gray-700 mb-2">
+      <label className="block text-xs font-semibold text-slate-700 mb-2">
         Copy Redirect IDs :
       </label>
 
@@ -128,20 +132,21 @@ function ProjectMapForeignIDs() {
             value={ids}
             onChange={(e) => setIds(e.target.value)}
             rows={11}
-            className="w-full border border-gray-300 rounded p-3 text-xs font-mono text-gray-800 focus:outline-none focus:border-blue-400 shadow-inner resize-y"
-            placeholder=""
+            className="w-full bg-slate-50/50 border border-slate-200 rounded-2xl p-4 text-xs font-mono text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-inner resize-y transition-all"
+            placeholder="Paste IDs here, one per line..."
           />
-          <p className="text-xs text-gray-600 mt-2 font-normal">
-            Copy Paste all IDs from Excel/CSV File in the above box
+          <p className="text-xs text-slate-500 mt-2 font-normal">
+            Copy & paste all IDs from your Excel/CSV file directly in the box above.
           </p>
         </div>
 
         <button
           onClick={handleDownload}
           disabled={loading}
-          className="bg-[#4eb3f7] hover:bg-sky-400 text-white font-bold text-xs px-4 py-2 rounded shadow-sm transition disabled:bg-blue-300 whitespace-nowrap self-start"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs transition disabled:opacity-50 whitespace-nowrap self-start flex items-center gap-2"
         >
-          {loading ? 'Mapping...' : 'Download Map IDs'}
+          <Download size={14} />
+          <span>{loading ? 'Mapping...' : 'Download Map IDs'}</span>
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Save, Trash2 } from 'lucide-react';
+import { Save, Trash2, Link2, Upload, FileCheck, AlertCircle } from 'lucide-react';
 import api from '../api';
 import Loader from './Loader';
 
@@ -79,95 +79,109 @@ function ProjectClientLink() {
   const remainingCodes = totalCodes - usedCodes;
 
   return (
-    <div className="bg-white p-6 rounded shadow-sm min-h-[500px]">
-      <h1 className="text-xl font-bold text-gray-800 mb-6">Import Unique Links</h1>
+    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 md:p-8 min-h-[500px]">
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <Link2 size={20} className="text-blue-600" />
+          Import Unique Client Links
+        </h1>
+        <p className="text-xs text-slate-500 mt-1">Batch import unique client entry tokens and monitor live allocation telemetry.</p>
+      </div>
 
       {/* 3 Metric Banner Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 mb-6 text-center rounded overflow-hidden">
-        <div className="bg-[#b3d4df] py-8">
-          <h3 className="text-2xl text-gray-800 mb-2 font-normal">Total Client Codes</h3>
-          <p className="text-2xl font-bold text-white">{totalCodes}</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-6 text-center">
+          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">Total Client Codes</span>
+          <p className="text-3xl font-extrabold text-slate-900 font-mono">{totalCodes}</p>
         </div>
-        <div className="bg-[#f86c6b] py-8">
-          <h3 className="text-2xl text-gray-800 mb-2 font-normal">Used Client Codes</h3>
-          <p className="text-2xl font-bold text-white">{usedCodes}</p>
+
+        <div className="bg-rose-50/50 border border-rose-200/60 rounded-2xl p-6 text-center">
+          <span className="text-[11px] font-semibold text-rose-700 uppercase tracking-wider block mb-1">Used Client Codes</span>
+          <p className="text-3xl font-extrabold text-rose-600 font-mono">{usedCodes}</p>
         </div>
-        <div className="bg-[#7ec2a6] py-8 relative">
-          <h3 className="text-2xl text-gray-800 mb-2 font-normal">Remaining Client Codes</h3>
-          <div className="flex justify-center items-center">
-             <span className="text-2xl font-bold text-white mr-1.5">{remainingCodes}</span>
-             <Trash2 
-               size={16} 
-               className="text-red-600 hover:text-red-800 cursor-pointer inline transition" 
-               title="Clear unused codes" 
-               onClick={handleClearUnused}
-             />
+
+        <div className="bg-emerald-50/50 border border-emerald-200/60 rounded-2xl p-6 text-center relative">
+          <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider block mb-1">Remaining Client Codes</span>
+          <div className="flex justify-center items-center gap-2">
+            <span className="text-3xl font-extrabold text-emerald-600 font-mono">{remainingCodes}</span>
+            {remainingCodes > 0 && (
+              <button 
+                onClick={handleClearUnused}
+                className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 transition"
+                title="Clear unused codes"
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Upload Controls */}
-      <div className="mb-6">
-        <label className="block text-xs text-gray-600 mb-1.5 font-medium">Select File :</label>
-        <div className="flex items-center space-x-2">
-          <div className="flex border rounded overflow-hidden shadow-sm bg-white">
-            <label className="bg-gray-100 hover:bg-gray-200 px-3.5 py-1.5 border-r cursor-pointer text-xs font-medium text-gray-700 transition">
-              Choose file
-              <input type="file" accept=".txt,.csv" className="hidden" onChange={handleFileChange} />
-            </label>
-            <span className="px-3.5 py-1.5 text-xs text-gray-500 bg-white min-w-[180px] flex items-center">
-              {file ? file.name : 'No file chosen'}
-            </span>
-          </div>
-          <button 
-            onClick={handleImport} 
-            disabled={isImporting} 
-            className="bg-[#4eb3f7] hover:bg-sky-400 disabled:bg-blue-300 text-white px-4 py-1.5 rounded text-xs font-bold flex items-center shadow-sm transition"
+      {/* Upload Box */}
+      <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-5 mb-8 max-w-xl">
+        <label className="block text-xs font-semibold text-slate-700 mb-2">Upload Link Codes File (.txt, .csv)</label>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <input
+            type="file"
+            accept=".txt,.csv"
+            onChange={handleFileChange}
+            className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+          />
+          <button
+            onClick={handleImport}
+            disabled={isImporting || !file}
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs transition disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
           >
-            <Save size={13} className="mr-1.5" /> {isImporting ? 'Importing...' : 'Import'}
+            {isImporting ? 'Importing...' : 'Import Codes'}
           </button>
         </div>
       </div>
 
-      {/* Data Table */}
-      {loading ? (
-        <Loader />
-      ) : (
-        <div className="overflow-x-auto border rounded">
-          <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
-            <thead>
-              <tr className="border-b text-gray-700 bg-white">
-                <th className="p-3 border-r font-medium text-gray-600">TTPID</th>
-                <th className="p-3 border-r font-medium text-gray-600">Vendor Name</th>
-                <th className="p-3 border-r font-medium text-gray-600">Started</th>
-                <th className="p-3 border-r font-medium text-gray-600">Completed On</th>
-                <th className="p-3 border-r font-medium text-gray-600">PanelList ID</th>
-                <th className="p-3 font-medium text-gray-600">Client Code</th>
-              </tr>
-            </thead>
-            <tbody>
-              {usedCodesList.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="p-4 text-center font-bold text-gray-900 border-b bg-white">
-                    No Client Code is Used
-                  </td>
+      {/* Table of Used Codes */}
+      <div>
+        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Live Codes Usage History</h3>
+        {loading ? (
+          <div className="py-12"><Loader /></div>
+        ) : (
+          <div className="border border-slate-200/80 rounded-xl overflow-hidden shadow-xs">
+            <table className="w-full text-left border-collapse text-xs whitespace-nowrap">
+              <thead>
+                <tr className="bg-slate-50/75 border-b border-slate-200/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                  <th className="py-3 px-4">TTPID</th>
+                  <th className="py-3 px-4">Vendor Name</th>
+                  <th className="py-3 px-4">Started</th>
+                  <th className="py-3 px-4">Completed On</th>
+                  <th className="py-3 px-4">Panelist ID</th>
+                  <th className="py-3 px-4">Client Code</th>
                 </tr>
-              ) : (
-                usedCodesList.map(c => (
-                  <tr key={c._id} className="border-b hover:bg-gray-50 transition">
-                    <td className="p-3 border-r text-gray-800">{c.ttpid || '-'}</td>
-                    <td className="p-3 border-r text-gray-800">{c.vendorName || '-'}</td>
-                    <td className="p-3 border-r text-gray-600">{c.started ? new Date(c.started).toLocaleString() : '-'}</td>
-                    <td className="p-3 border-r text-gray-600">{c.completedOn ? new Date(c.completedOn).toLocaleString() : '-'}</td>
-                    <td className="p-3 border-r text-gray-800">{c.panelListId || '-'}</td>
-                    <td className="p-3 font-mono font-medium text-blue-600">{c.clientCode}</td>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {usedCodesList.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="py-10 text-center text-slate-400">
+                      <FileCheck size={28} className="mx-auto mb-2 opacity-40" />
+                      <p className="text-xs font-medium text-slate-600">No Client Code is Used</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Codes will appear here as participants complete surveys.</p>
+                    </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+                ) : (
+                  usedCodesList.map((c, i) => (
+                    <tr key={i} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="py-3 px-4 font-mono font-semibold text-blue-600">{c.ttpid || '-'}</td>
+                      <td className="py-3 px-4 text-slate-800 font-medium">{c.vendorName || '-'}</td>
+                      <td className="py-3 px-4 text-slate-500 font-mono text-[11px]">{c.started ? new Date(c.started).toLocaleString() : '-'}</td>
+                      <td className="py-3 px-4 text-slate-500 font-mono text-[11px]">{c.completedOn ? new Date(c.completedOn).toLocaleString() : '-'}</td>
+                      <td className="py-3 px-4 font-mono text-slate-700">{c.panelListId || '-'}</td>
+                      <td className="py-3 px-4 font-mono text-emerald-600 font-semibold">{c.clientCode}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
-import { Upload, CheckCircle, RefreshCw } from 'lucide-react';
+import { Upload, CheckCircle2, RefreshCw, AlertTriangle, GitCompare, FileSpreadsheet } from 'lucide-react';
 
 function ProjectReconcile() {
   const { id } = useParams();
@@ -11,13 +11,19 @@ function ProjectReconcile() {
   const [reconciling, setReconciling] = useState(false);
   const [reconcileResult, setReconcileResult] = useState(null);
 
-  // If Child Project (has parentProjectId), display exact message from reference screenshot
+  // If Child Project (has parentProjectId)
   if (project?.parentProjectId) {
     return (
-      <div className="bg-white p-16 text-center shadow-sm min-h-[450px] flex items-center justify-center">
-        <h2 className="text-2xl font-normal text-[#dc3545] tracking-wide">
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-12 md:p-16 text-center shadow-xs min-h-[420px] flex flex-col items-center justify-center">
+        <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4 border border-rose-100">
+          <AlertTriangle size={28} />
+        </div>
+        <h2 className="text-xl font-bold text-rose-600 mb-2">
           Reconcile Process is not available in Child Project.
         </h2>
+        <p className="text-xs text-slate-500 max-w-md">
+          Child projects inherit billing reconciliation and status adjustments directly from their parent project. Please open the parent project to run true-up operations.
+        </p>
       </div>
     );
   }
@@ -44,73 +50,77 @@ function ProjectReconcile() {
   };
 
   return (
-    <div className="bg-white p-6 rounded shadow-sm min-h-[500px]">
-      <div className="border-b pb-4 mb-6 flex justify-between items-center">
+    <div className="bg-white rounded-2xl border border-slate-200/80 p-6 md:p-8 shadow-xs min-h-[500px]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-800">Project Reconciliation & True-Up</h1>
-          <p className="text-xs text-gray-500 mt-1">Upload client reconciliation file to update respondent statuses and true-up vendor counts.</p>
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <GitCompare size={20} className="text-blue-600" />
+            Project Reconciliation & True-Up
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">Upload client true-up sheets to synchronize finalized respondent outcomes and recalculate margins.</p>
         </div>
-        <div className="flex space-x-2">
-          <button className="bg-[#4b8df8] hover:bg-blue-600 text-white px-4 py-1.5 rounded text-xs font-bold shadow-sm flex items-center">
-            <RefreshCw size={13} className="mr-1.5" /> Run True-Up
+        <div className="flex items-center space-x-2">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-xs flex items-center transition">
+            <RefreshCw size={13} className="mr-1.5" /> Run True-Up Sync
           </button>
         </div>
       </div>
 
       {/* File Upload Section */}
-      <div className="bg-gray-50 border p-6 rounded mb-6 max-w-2xl">
-        <label className="block text-xs font-bold text-gray-700 mb-2">Upload Client Reconciliation File (.csv, .xlsx)</label>
-        <div className="flex items-center space-x-3">
-          <div className="flex border rounded overflow-hidden bg-white text-xs">
-            <label className="bg-gray-100 hover:bg-gray-200 px-3.5 py-2 border-r cursor-pointer font-medium text-gray-700">
-              Choose file
-              <input type="file" accept=".csv,.xlsx,.txt" className="hidden" onChange={e => setFile(e.target.files[0])} />
-            </label>
-            <span className="px-3.5 py-2 text-gray-500 min-w-[200px] flex items-center">
-              {file ? file.name : 'No file chosen'}
-            </span>
-          </div>
+      <div className="bg-slate-50/70 border border-slate-200/80 p-6 rounded-2xl mb-8 max-w-2xl">
+        <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+          Upload Client Reconciliation File (.csv, .xlsx)
+        </label>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <input 
+            type="file" 
+            accept=".csv,.xlsx,.txt" 
+            onChange={e => setFile(e.target.files[0])}
+            className="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+          />
           <button 
             onClick={handleUploadReconcile}
-            disabled={reconciling}
-            className="bg-[#00b5ad] hover:bg-teal-600 text-white font-bold text-xs px-5 py-2 rounded shadow-sm flex items-center transition"
+            disabled={reconciling || !file}
+            className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs flex items-center justify-center transition disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
           >
             <Upload size={13} className="mr-1.5" /> {reconciling ? 'Processing...' : 'Upload & Reconcile'}
           </button>
         </div>
-        <p className="text-[11px] text-gray-500 mt-2">Required file headers: <code className="bg-white px-1 py-0.5 border rounded">TTPID</code>, <code className="bg-white px-1 py-0.5 border rounded">Status_ID</code></p>
+        <p className="text-[11px] text-slate-500 mt-2.5">
+          Expected file columns: <code className="bg-white px-1.5 py-0.5 border border-slate-200 rounded font-mono text-[10px]">TTPID</code>, <code className="bg-white px-1.5 py-0.5 border border-slate-200 rounded font-mono text-[10px]">Status_ID</code>
+        </p>
       </div>
 
       {reconcileResult && (
-        <div className="bg-green-50 border border-green-200 p-4 rounded mb-6 text-xs text-green-800 flex items-center justify-between">
+        <div className="bg-emerald-50 border border-emerald-200/80 p-4 rounded-xl mb-6 text-xs text-emerald-900 flex items-center justify-between">
           <div className="flex items-center">
-            <CheckCircle size={16} className="text-green-600 mr-2" />
+            <CheckCircle2 size={16} className="text-emerald-600 mr-2 flex-shrink-0" />
             <span>{reconcileResult.message} ({reconcileResult.approved} Approved, {reconcileResult.rejected} Rejected)</span>
           </div>
         </div>
       )}
 
       {/* Reconciliation Guidelines & Mapping */}
-      <div className="border rounded overflow-hidden">
-        <div className="bg-gray-50 p-3 border-b font-bold text-xs text-gray-700">
+      <div className="border border-slate-200/80 rounded-2xl overflow-hidden shadow-xs">
+        <div className="bg-slate-50/80 px-5 py-3 border-b border-slate-200/80 font-bold text-xs text-slate-800">
           Accepted Status ID Codes for Reconciliation
         </div>
-        <div className="p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-          <div className="bg-gray-50 p-2.5 rounded border">
-            <span className="font-bold text-green-600 block">6 : Completed</span>
-            <span className="text-[11px] text-gray-500">Billable Complete</span>
+        <div className="p-5 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-200/60">
+            <span className="font-bold text-emerald-600 block mb-0.5">6 : Completed</span>
+            <span className="text-[10px] text-slate-500">Billable completion</span>
           </div>
-          <div className="bg-gray-50 p-2.5 rounded border">
-            <span className="font-bold text-orange-500 block">7 : Disqualified</span>
-            <span className="text-[11px] text-gray-500">Screenout</span>
+          <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-200/60">
+            <span className="font-bold text-amber-600 block mb-0.5">7 : Disqualified</span>
+            <span className="text-[10px] text-slate-500">Screener exit</span>
           </div>
-          <div className="bg-gray-50 p-2.5 rounded border">
-            <span className="font-bold text-red-500 block">10 : Security Term</span>
-            <span className="text-[11px] text-gray-500">Fraud / Proxy</span>
+          <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-200/60">
+            <span className="font-bold text-purple-600 block mb-0.5">8 : Quota FULL</span>
+            <span className="text-[10px] text-slate-500">Target cap met</span>
           </div>
-          <div className="bg-gray-50 p-2.5 rounded border">
-            <span className="font-bold text-red-600 block">14 : Speeding</span>
-            <span className="text-[11px] text-gray-500">Bad Quality</span>
+          <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-200/60">
+            <span className="font-bold text-rose-600 block mb-0.5">10+ : Rejected</span>
+            <span className="text-[10px] text-slate-500">Security / Speeding</span>
           </div>
         </div>
       </div>

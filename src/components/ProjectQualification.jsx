@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Edit2, Trash2, X, Plus } from 'lucide-react';
+import { Edit2, Trash2, X, Plus, Filter, CheckCircle2 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import api from '../api';
 import Loader from './Loader';
@@ -103,44 +103,32 @@ function ProjectQualification() {
       let payload = {
         questionType: 'Custom',
         questionName: customForm.questionName.trim(),
-        customQuestionName: customForm.questionName.trim(),
         fieldType: customForm.fieldType,
         isActive: true
       };
 
       if (customForm.fieldType === 'Range') {
-        if (!customForm.rangeStart || !customForm.rangeEnd) {
-          return alert('Please enter Start and End range.');
-        }
-        payload.ranges = [{
-          start: customForm.rangeStart,
-          end: customForm.rangeEnd,
-          valid: 1,
-          optionText: '-'
-        }];
-        payload.rangeStart = customForm.rangeStart;
-        payload.rangeEnd = customForm.rangeEnd;
+        const start = Number(customForm.rangeStart) || 0;
+        const end = Number(customForm.rangeEnd) || 100;
+        payload.ranges = [{ start, end, valid: 1, optionText: '-' }];
       } else {
         const opts = customForm.optionsText
-          .split('\n')
-          .map(s => s.trim())
+          .split(/\r?\n/)
+          .map(o => o.trim())
           .filter(Boolean);
-
-        if (opts.length === 0) {
-          return alert('Please enter at least one option.');
-        }
-        payload.optionItems = opts.map(opt => ({
-          start: '-',
-          end: '-',
-          valid: 1,
-          optionText: opt
-        }));
         payload.options = opts;
+        payload.optionItems = opts.map(opt => ({ start: '-', end: '-', valid: 1, optionText: opt }));
       }
 
       await api.post(`/admin/projects/${id}/qualifications`, payload);
       setShowAddCustomModal(false);
-      setCustomForm({ questionName: '', fieldType: 'Dropdown', optionsText: '', rangeStart: '', rangeEnd: '' });
+      setCustomForm({
+        questionName: '',
+        fieldType: 'Dropdown',
+        optionsText: '',
+        rangeStart: '',
+        rangeEnd: ''
+      });
       fetchQualifications();
     } catch (e) {
       console.error(e);
@@ -178,40 +166,47 @@ function ProjectQualification() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 pt-4 pb-12">
+    <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold text-gray-800">Project Qualification</h1>
-        <div className="flex space-x-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <Filter size={20} className="text-blue-600" />
+            Project Qualification
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">Define demographic criteria, screener rules, and range constraints for survey entry.</p>
+        </div>
+        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
           <button 
             onClick={() => setShowAddCustomModal(true)} 
-            className="bg-[#4eb3f7] hover:bg-sky-400 text-white px-3.5 py-1.5 rounded text-xs font-bold flex items-center shadow-sm transition"
+            className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center shadow-xs transition"
           >
-            + Add Custom Qualification
+            <Plus size={14} className="mr-1.5" /> Add Custom
           </button>
           <button 
             onClick={() => setShowAddStandardModal(true)} 
-            className="bg-black hover:bg-gray-800 text-white px-3.5 py-1.5 rounded text-xs font-bold flex items-center shadow-sm transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center shadow-xs hover:shadow transition"
           >
-            + Add Qualification
+            <Plus size={14} className="mr-1.5" /> Add Standard Preset
           </button>
         </div>
       </div>
 
       {loading ? (
-        <Loader />
+        <div className="py-12"><Loader /></div>
       ) : qualifications.length === 0 ? (
-        <div className="bg-white border rounded p-8 text-center text-gray-400 text-sm">
-          No qualifications added yet. Click &quot;+ Add Qualification&quot; or &quot;+ Add Custom Qualification&quot; to set rules.
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-12 text-center text-slate-400 text-xs shadow-xs">
+          <Filter size={32} className="mx-auto mb-2 opacity-30" />
+          <p className="font-semibold text-slate-700 text-sm">No qualifications configured</p>
+          <p className="text-slate-400 mt-1">Click &quot;Add Standard Preset&quot; (Age/Gender) or &quot;Add Custom&quot; to establish participant screening.</p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-5">
           {qualifications.map(q => {
             const isRange = q.fieldType === 'Range' || q.questionType === 'Age';
             const questionTitle = q.questionName || q.customQuestionName || (q.questionType === 'Age' ? 'What is your age?' : (q.questionType === 'Gender' ? 'What is your gender?' : 'Custom Qualification'));
             const badgeType = q.fieldType || (isRange ? 'Range' : 'Dropdown');
 
-            // Normalize rows for table display
             let rows = [];
             if (isRange) {
               if (q.ranges && q.ranges.length > 0) {
@@ -228,26 +223,28 @@ function ProjectQualification() {
             }
 
             return (
-              <div key={q._id} className="border border-gray-200 rounded overflow-hidden shadow-sm bg-white">
+              <div key={q._id} className="border border-slate-200/80 rounded-2xl overflow-hidden shadow-xs bg-white">
                 {/* Header Bar */}
-                <div className="bg-[#d9edf7] border-b border-[#bce8f1] px-4 py-2 flex items-center justify-between">
-                  <div className="flex items-center">
-                    <span className="text-blue-600 font-bold text-xs border-b border-dashed border-blue-600 cursor-pointer mr-2.5">
+                <div className="bg-slate-50/80 border-b border-slate-200/80 px-5 py-3.5 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                       {q.isActive !== false ? 'Active' : 'Inactive'}
                     </span>
-                    <button className="mr-2 text-amber-600 hover:text-amber-700 p-0.5" title="Edit">
-                      <Edit2 size={13} />
-                    </button>
-                    <button onClick={() => handleDelete(q._id)} className="text-red-500 hover:text-red-700 p-0.5" title="Delete Rule">
-                      <Trash2 size={13} />
-                    </button>
 
-                    <span className="text-sm font-bold text-gray-800 ml-6">
+                    <span className="text-sm font-bold text-slate-900">
                       {questionTitle}
                     </span>
-                    <span className="ml-2.5 bg-[#00c0ef] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+
+                    <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
                       {badgeType}
                     </span>
+                  </div>
+
+                  <div className="flex items-center space-x-1">
+                    <button onClick={() => handleDelete(q._id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition" title="Delete Rule">
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 </div>
 
@@ -255,36 +252,38 @@ function ProjectQualification() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="border-b bg-gray-50/50 text-gray-700">
-                        <th className="py-2.5 px-4 w-28"></th>
-                        <th className="py-2.5 px-4 font-semibold text-gray-600 w-24">Start</th>
-                        <th className="py-2.5 px-4 font-semibold text-gray-600 w-24">End</th>
-                        <th className="py-2.5 px-4 font-semibold text-gray-600 w-24">Valid?</th>
-                        <th className="py-2.5 px-4 font-semibold text-gray-600">Option Text</th>
+                      <tr className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                        <th className="py-2.5 px-4 w-28">Status</th>
+                        <th className="py-2.5 px-4 w-24">Start</th>
+                        <th className="py-2.5 px-4 w-24">End</th>
+                        <th className="py-2.5 px-4 w-24">Valid?</th>
+                        <th className="py-2.5 px-4">Option Text</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-slate-100">
                       {rows.map((row, idx) => (
-                        <tr key={idx} className="border-b hover:bg-gray-50/80 transition">
+                        <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
                           <td className="py-2.5 px-4 whitespace-nowrap">
-                            <Trash2 
-                              size={12} 
-                              className="text-red-500 inline mr-1.5 cursor-pointer hover:text-red-700" 
-                              onClick={() => handleDeleteRow(q, idx, isRange)}
-                            />
-                            <span className="text-blue-500 text-xs font-medium cursor-pointer border-b border-dashed border-blue-400">
-                              Active
-                            </span>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                className="text-slate-300 hover:text-rose-500 transition"
+                                onClick={() => handleDeleteRow(q, idx, isRange)}
+                                title="Remove row"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                              <span className="text-xs font-semibold text-emerald-600">Active</span>
+                            </div>
                           </td>
-                          <td className="py-2.5 px-4 text-blue-600 font-bold">{row.start !== undefined ? row.start : '-'}</td>
-                          <td className="py-2.5 px-4 text-blue-600 font-bold">{row.end !== undefined ? row.end : '-'}</td>
-                          <td className="py-2.5 px-4 text-blue-600 font-bold">{row.valid !== undefined ? row.valid : '1'}</td>
-                          <td className="py-2.5 px-4 text-gray-800 font-medium">{row.optionText || '-'}</td>
+                          <td className="py-2.5 px-4 font-mono font-semibold text-blue-600">{row.start !== undefined ? row.start : '-'}</td>
+                          <td className="py-2.5 px-4 font-mono font-semibold text-blue-600">{row.end !== undefined ? row.end : '-'}</td>
+                          <td className="py-2.5 px-4 font-mono font-semibold text-slate-700">{row.valid !== undefined ? row.valid : '1'}</td>
+                          <td className="py-2.5 px-4 text-slate-800 font-medium">{row.optionText || '-'}</td>
                         </tr>
                       ))}
                       {rows.length === 0 && (
                         <tr>
-                          <td colSpan={5} className="py-4 text-center text-gray-400">
+                          <td colSpan={5} className="py-6 text-center text-slate-400">
                             No options or ranges configured.
                           </td>
                         </tr>
@@ -300,47 +299,47 @@ function ProjectQualification() {
 
       {/* Modal: Add Standard Qualification */}
       {showAddStandardModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded shadow-xl w-full max-w-md border border-gray-200">
-            <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h3 className="text-base font-bold text-gray-800">Add Standard Qualification</h3>
-              <button onClick={() => setShowAddStandardModal(false)} className="text-gray-400 hover:text-gray-700">
+        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-slate-200/80">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+              <h3 className="text-sm font-bold text-slate-900">Add Standard Qualification</h3>
+              <button onClick={() => setShowAddStandardModal(false)} className="text-slate-400 hover:text-slate-700 p-1">
                 <X size={18} />
               </button>
             </div>
             <div className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-gray-700 mb-1">Select Question</label>
+                <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Select Demographic Question</label>
                 <select 
-                  className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 text-xs"
+                  className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={selectedStandard}
                   onChange={e => setSelectedStandard(e.target.value)}
                 >
-                  <option value="age">What is your age? (Range: 18-24, 25-34, 35-44...)</option>
+                  <option value="age">What is your age? (Ranges: 18-24, 25-34, 35-44...)</option>
                   <option value="gender">What is your gender? (Dropdown: Male, Female)</option>
                 </select>
               </div>
 
-              <div className="bg-blue-50 p-3 rounded border border-blue-100 text-blue-800">
+              <div className="bg-blue-50/60 p-3.5 rounded-xl border border-blue-200/60 text-blue-900 leading-relaxed text-[11px]">
                 {selectedStandard === 'age' ? (
-                  <p>This will pre-fill standard Age ranges (18-24, 25-34, 35-44, 45-54, 55-64, 65-99) matching standard demographic rules.</p>
+                  <p>Pre-fills 6 standard demographic age brackets (18-24, 25-34, 35-44, 45-54, 55-64, 65-99) with full validation.</p>
                 ) : (
-                  <p>This will pre-fill standard Gender options (Male, Female).</p>
+                  <p>Pre-fills standard gender options (Male, Female) with validation.</p>
                 )}
               </div>
             </div>
-            <div className="bg-gray-50 px-6 py-3 border-t flex justify-end space-x-2">
+            <div className="bg-slate-50 px-6 py-3.5 border-t border-slate-100 flex justify-end space-x-2">
               <button 
                 onClick={() => setShowAddStandardModal(false)}
-                className="px-4 py-1.5 border rounded text-gray-600 hover:bg-gray-100 text-xs font-medium"
+                className="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleAddStandard}
-                className="px-4 py-1.5 bg-black hover:bg-gray-800 text-white rounded text-xs font-bold shadow-sm"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs"
               >
-                Add Rule
+                Add Preset
               </button>
             </div>
           </div>
@@ -349,20 +348,20 @@ function ProjectQualification() {
 
       {/* Modal: Add Custom Qualification */}
       {showAddCustomModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded shadow-xl w-full max-w-lg border border-gray-200">
-            <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h3 className="text-base font-bold text-gray-800">Add Custom Qualification</h3>
-              <button onClick={() => setShowAddCustomModal(false)} className="text-gray-400 hover:text-gray-700">
+        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200/80">
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+              <h3 className="text-sm font-bold text-slate-900">Add Custom Qualification</h3>
+              <button onClick={() => setShowAddCustomModal(false)} className="text-slate-400 hover:text-slate-700 p-1">
                 <X size={18} />
               </button>
             </div>
             <div className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-gray-700 mb-1">Question Text</label>
+                <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Question Text</label>
                 <input 
                   type="text" 
-                  className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 text-xs" 
+                  className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" 
                   placeholder="e.g. What is your household income?"
                   value={customForm.questionName}
                   onChange={e => setCustomForm({ ...customForm, questionName: e.target.value })}
@@ -370,9 +369,9 @@ function ProjectQualification() {
               </div>
 
               <div>
-                <label className="block font-bold text-gray-700 mb-1">Field Type</label>
+                <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Field Type</label>
                 <select 
-                  className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 text-xs"
+                  className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                   value={customForm.fieldType}
                   onChange={e => setCustomForm({ ...customForm, fieldType: e.target.value })}
                 >
@@ -384,21 +383,21 @@ function ProjectQualification() {
               {customForm.fieldType === 'Range' ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-bold text-gray-700 mb-1">Start Value</label>
+                    <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Start Value</label>
                     <input 
                       type="number" 
-                      className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 text-xs" 
-                      placeholder="e.g. 18"
+                      className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" 
+                      placeholder="18"
                       value={customForm.rangeStart}
                       onChange={e => setCustomForm({ ...customForm, rangeStart: e.target.value })}
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-gray-700 mb-1">End Value</label>
+                    <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">End Value</label>
                     <input 
                       type="number" 
-                      className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 text-xs" 
-                      placeholder="e.g. 65"
+                      className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" 
+                      placeholder="65"
                       value={customForm.rangeEnd}
                       onChange={e => setCustomForm({ ...customForm, rangeEnd: e.target.value })}
                     />
@@ -406,10 +405,10 @@ function ProjectQualification() {
                 </div>
               ) : (
                 <div>
-                  <label className="block font-bold text-gray-700 mb-1">Allowed Options (One per line)</label>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Allowed Options (One per line)</label>
                   <textarea 
                     rows={4}
-                    className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 text-xs" 
+                    className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-y font-mono" 
                     placeholder="Option 1&#10;Option 2&#10;Option 3"
                     value={customForm.optionsText}
                     onChange={e => setCustomForm({ ...customForm, optionsText: e.target.value })}
@@ -417,18 +416,18 @@ function ProjectQualification() {
                 </div>
               )}
             </div>
-            <div className="bg-gray-50 px-6 py-3 border-t flex justify-end space-x-2">
+            <div className="bg-slate-50 px-6 py-3.5 border-t border-slate-100 flex justify-end space-x-2">
               <button 
                 onClick={() => setShowAddCustomModal(false)}
-                className="px-4 py-1.5 border rounded text-gray-600 hover:bg-gray-100 text-xs font-medium"
+                className="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleAddCustom}
-                className="px-4 py-1.5 bg-[#4eb3f7] hover:bg-sky-400 text-white rounded text-xs font-bold shadow-sm"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-xs"
               >
-                Save
+                Save Qualification
               </button>
             </div>
           </div>

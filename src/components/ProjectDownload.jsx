@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Download, FileSpreadsheet, Users, ShieldAlert } from 'lucide-react';
 import api from '../api';
 
 function ProjectDownload() {
@@ -100,73 +101,107 @@ function ProjectDownload() {
   };
 
   return (
-    <div className="bg-white p-6 rounded shadow-sm min-h-[450px]">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+    <div className="bg-white rounded-2xl border border-slate-200/80 p-6 md:p-8 shadow-xs min-h-[480px]">
+      <div className="mb-8">
+        <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <Download size={20} className="text-blue-600" />
+          Download Telemetry & Reports
+        </h1>
+        <p className="text-xs text-slate-500 mt-1">Export raw session IDs, full respondent journey audits, and fraud/rejection extracts.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Column 1: Download Project IDs */}
-        <div className="pr-8 pb-6 md:pb-0">
-          <h2 className="text-xl font-normal text-gray-800 mb-4">Download Project IDs</h2>
-          
-          <div className="flex items-center space-x-6 mb-6 text-xs text-gray-700">
-            <label className="flex items-center cursor-pointer select-none">
-              <input 
-                type="checkbox" 
-                checked={options.extension}
-                onChange={e => setOptions({ ...options, extension: e.target.checked })}
-                className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-0" 
-              /> 
-              Extension
-            </label>
-            <label className="flex items-center cursor-pointer select-none">
-              <input 
-                type="checkbox" 
-                checked={options.askOnRedirect}
-                onChange={e => setOptions({ ...options, askOnRedirect: e.target.checked })}
-                className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-0" 
-              /> 
-              Ask on Redirect
-            </label>
-            <label className="flex items-center cursor-pointer select-none">
-              <input 
-                type="checkbox" 
-                checked={options.referrer}
-                onChange={e => setOptions({ ...options, referrer: e.target.checked })}
-                className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-0" 
-              /> 
-              Referrer
-            </label>
+        <div className="p-6 rounded-2xl bg-slate-50/70 border border-slate-200/80 flex flex-col justify-between">
+          <div>
+            <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+              <FileSpreadsheet size={20} />
+            </div>
+            <h2 className="text-base font-bold text-slate-900 mb-2">Project Session IDs</h2>
+            <p className="text-xs text-slate-500 mb-5 leading-relaxed">
+              Export tracking IDs with optional metadata fields for client delivery reconciliation.
+            </p>
+            
+            <div className="space-y-2.5 mb-6 text-xs text-slate-700">
+              <label className="flex items-center cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  checked={options.extension}
+                  onChange={e => setOptions({ ...options, extension: e.target.checked })}
+                  className="mr-2 rounded border-slate-300 text-blue-600 focus:ring-0" 
+                /> 
+                Include Passthru Extension
+              </label>
+              <label className="flex items-center cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  checked={options.askOnRedirect}
+                  onChange={e => setOptions({ ...options, askOnRedirect: e.target.checked })}
+                  className="mr-2 rounded border-slate-300 text-blue-600 focus:ring-0" 
+                /> 
+                Ask on Redirect Flag
+              </label>
+              <label className="flex items-center cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  checked={options.referrer}
+                  onChange={e => setOptions({ ...options, referrer: e.target.checked })}
+                  className="mr-2 rounded border-slate-300 text-blue-600 focus:ring-0" 
+                /> 
+                HTTP Referrer Domain
+              </label>
+            </div>
           </div>
 
           <button 
             onClick={() => handleDownload('project_ids')}
             disabled={downloading === 'project_ids'}
-            className="bg-[#4eb3f7] hover:bg-sky-400 text-white font-bold text-xs px-4 py-2 rounded shadow-sm transition disabled:bg-blue-300"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-2.5 rounded-xl shadow-xs transition disabled:opacity-50"
           >
-            {downloading === 'project_ids' ? 'Generating...' : 'Download'}
+            {downloading === 'project_ids' ? 'Generating CSV...' : 'Download Project IDs'}
           </button>
         </div>
 
         {/* Column 2: Respondent Data */}
-        <div className="px-8 py-6 md:py-0">
-          <h2 className="text-xl font-normal text-gray-800 mb-10">Respondent Data</h2>
+        <div className="p-6 rounded-2xl bg-slate-50/70 border border-slate-200/80 flex flex-col justify-between">
+          <div>
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
+              <Users size={20} />
+            </div>
+            <h2 className="text-base font-bold text-slate-900 mb-2">Respondent Data</h2>
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+              Full breakdown including IP addresses, timestamp telemetry, supplier vendor name, and individual status codes.
+            </p>
+          </div>
+
           <button 
             onClick={() => handleDownload('respondent_data')}
             disabled={downloading === 'respondent_data'}
-            className="bg-[#4eb3f7] hover:bg-sky-400 text-white font-bold text-xs px-4 py-2 rounded shadow-sm transition disabled:bg-blue-300"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2.5 rounded-xl shadow-xs transition disabled:opacity-50"
           >
-            {downloading === 'respondent_data' ? 'Generating...' : 'Download'}
+            {downloading === 'respondent_data' ? 'Generating CSV...' : 'Download Respondent Data'}
           </button>
         </div>
 
         {/* Column 3: Rejected IDs */}
-        <div className="pl-8 pt-6 md:pt-0">
-          <h2 className="text-xl font-normal text-gray-800 mb-10">Rejected IDs</h2>
+        <div className="p-6 rounded-2xl bg-slate-50/70 border border-slate-200/80 flex flex-col justify-between">
+          <div>
+            <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center mb-4">
+              <ShieldAlert size={20} />
+            </div>
+            <h2 className="text-base font-bold text-slate-900 mb-2">Rejected & Fraud IDs</h2>
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+              Targeted list of all security terminated, speeding, IP mismatched, or quality-failed traffic sessions.
+            </p>
+          </div>
+
           <button 
             onClick={() => handleDownload('rejected_ids')}
             disabled={downloading === 'rejected_ids'}
-            className="bg-[#4eb3f7] hover:bg-sky-400 text-white font-bold text-xs px-4 py-2 rounded shadow-sm transition disabled:bg-blue-300"
+            className="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs py-2.5 rounded-xl shadow-xs transition disabled:opacity-50"
           >
-            {downloading === 'rejected_ids' ? 'Generating...' : 'Download'}
+            {downloading === 'rejected_ids' ? 'Generating CSV...' : 'Download Rejected IDs'}
           </button>
         </div>
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 import Loader from './Loader';
-import { Edit, Trash2, Save } from 'lucide-react';
+import { Edit, Trash2, Save, Building2, Plus, Search, ChevronLeft, ChevronRight, Globe, Mail, Phone } from 'lucide-react';
 import { Country, State } from 'country-state-city';
 import { COUNTRIES } from '../utils/countries';
 
@@ -33,6 +33,7 @@ function Companies() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [search, setSearch] = useState('');
   
   const emptyForm = {
     companyType: '', name: '', abrvName: '', contactNumber: '', email: '', invoiceEmail: '',
@@ -51,7 +52,7 @@ function Companies() {
     try {
       setLoading(true);
       const res = await api.get('/admin/companies');
-      setCompanies(res.data);
+      setCompanies(res.data || []);
     } catch(err) {
       console.error(err);
     } finally {
@@ -59,23 +60,49 @@ function Companies() {
     }
   };
 
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const handleCountryChange = (cName) => {
+    set('country', cName);
+    set('state', '');
+  };
+
+  const getStates = () => {
+    if (!form.country) return [];
+    const cObj = Country.getAllCountries().find(c => c.name.toLowerCase() === form.country.toLowerCase());
+    if (cObj) {
+      return State.getStatesOfCountry(cObj.isoCode).map(s => s.name);
+    }
+    return [];
+  };
 
   const handleSave = async () => {
-    if (!form.name) return alert('Company Name is required');
+    if (!form.companyType || !form.name || !form.contactNumber || !form.email || !form.invoiceEmail || !form.invoicingMethod || !form.paymentTerms || !form.city || !form.country) {
+      return alert("Please fill all required fields marked with *");
+    }
+
     try {
+      const payload = { ...form };
       if (editId) {
-        await api.put(`/admin/companies/${editId}`, form);
+        await api.put(`/admin/companies/${editId}`, payload);
       } else {
-        await api.post('/admin/companies', form);
+        await api.post('/admin/companies', payload);
       }
       setShowForm(false);
-      setForm(emptyForm);
       setEditId(null);
       fetchData();
     } catch(err) {
-      console.error(err);
-      alert('Failed to save company.');
+      alert(err.response?.data?.message || err.message || "Failed to save company");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this company?")) return;
+    try {
+      await api.delete(`/admin/companies/${id}`);
+      fetchData();
+    } catch(err) {
+      alert("Failed to delete company");
     }
   };
 
@@ -107,169 +134,150 @@ function Companies() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this company?")) {
-      try {
-        await api.delete(`/admin/companies/${id}`);
-        fetchData();
-      } catch(err) { alert('Error deleting company'); }
-    }
-  };
+  const filtered = companies.filter(c => {
+    if (!search) return true;
+    const term = search.toLowerCase();
+    return (c.name || '').toLowerCase().includes(term) || (c.companyType || '').toLowerCase().includes(term) || (c.email || '').toLowerCase().includes(term);
+  });
 
   return (
-    <div className="bg-gray-50 p-4 min-h-screen">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">{showForm ? (editId ? 'Edit Company' : 'Add Company') : 'Company List'}</h2>
-        {!showForm && (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2.5">
+            <Building2 className="text-blue-600" size={24} />
+            {showForm ? (editId ? 'Edit Company' : 'New Company Profile') : 'Companies Directory'}
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">Manage client accounts, vendor partners, invoicing terms, and postback redirect end pages.</p>
+        </div>
+
+        {!showForm ? (
           <button 
             onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(true); }}
-            className="bg-gray-800 text-white px-3 py-1.5 text-sm rounded shadow-sm hover:bg-gray-700"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs shadow-xs hover:shadow transition self-start sm:self-auto"
           >
-            + New Company
+            <Plus size={15} />
+            <span>New Company</span>
+          </button>
+        ) : (
+          <button 
+            onClick={() => setShowForm(false)}
+            className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 transition self-start sm:self-auto"
+          >
+            Back to Directory
           </button>
         )}
       </div>
 
       {showForm ? (
-        <div className="bg-white p-6 rounded shadow-sm">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-sm">
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 md:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-xs">
             
             {/* Left Column (2/3 width) - Company Details */}
             <div className="lg:col-span-2 space-y-4">
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-red-500 mb-1">Company Type</label>
-                  <select className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.companyType} onChange={e => set('companyType', e.target.value)}>
-                    <option value="">Company Type</option>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Company Type <span className="text-rose-500">*</span></label>
+                  <select className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.companyType} onChange={e => set('companyType', e.target.value)}>
+                    <option value="">Select Type</option>
                     <option value="Client">Client</option>
                     <option value="Vendor">Vendor</option>
-                    <option value="Both">Both</option>
+                    <option value="Both">Both (Client & Vendor)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-red-500 mb-1">Company Name</label>
-                  <input type="text" className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.name} onChange={e => set('name', e.target.value)} />
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Company Name <span className="text-rose-500">*</span></label>
+                  <input type="text" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.name} onChange={e => set('name', e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-gray-700 mb-1">ABRV Name</label>
-                  <input type="text" className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.abrvName} onChange={e => set('abrvName', e.target.value)} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-red-500 mb-1">Contact Number</label>
-                  <input type="text" className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.contactNumber} onChange={e => set('contactNumber', e.target.value)} />
-                </div>
-                <div>
-                  <label className="block text-red-500 mb-1">Company Email</label>
-                  <input type="email" className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.email} onChange={e => set('email', e.target.value)} />
-                </div>
-                <div>
-                  <label className="block text-red-500 mb-1">Company Invoice Email</label>
-                  <input type="email" className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.invoiceEmail} onChange={e => set('invoiceEmail', e.target.value)} />
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">ABRV Name</label>
+                  <input type="text" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.abrvName} onChange={e => set('abrvName', e.target.value)} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-gray-700 mb-1">Company Tax ID</label>
-                  <input type="text" className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.taxId} onChange={e => set('taxId', e.target.value)} />
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Contact Number <span className="text-rose-500">*</span></label>
+                  <input type="text" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.contactNumber} onChange={e => set('contactNumber', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Company Email <span className="text-rose-500">*</span></label>
+                  <input type="email" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.email} onChange={e => set('email', e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Invoice Email <span className="text-rose-500">*</span></label>
+                  <input type="email" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.invoiceEmail} onChange={e => set('invoiceEmail', e.target.value)} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Company Tax ID</label>
+                  <input type="text" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.taxId} onChange={e => set('taxId', e.target.value)} />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-gray-700 mb-1">Company Address</label>
-                  <input type="text" className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.address} onChange={e => set('address', e.target.value)} />
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Address</label>
+                  <input type="text" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.address} onChange={e => set('address', e.target.value)} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-red-500 mb-1">Invoicing Method *</label>
-                  <select className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.invoicingMethod} onChange={e => set('invoicingMethod', e.target.value)}>
-                    <option value="">Select</option>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Invoicing Method <span className="text-rose-500">*</span></label>
+                  <select className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.invoicingMethod} onChange={e => set('invoicingMethod', e.target.value)}>
+                    <option value="">Select Method</option>
                     <option value="Monthly Basis">Monthly Basis</option>
                     <option value="Project Basis">Project Basis</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-red-500 mb-1">Payment terms *</label>
-                  <select className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.paymentTerms} onChange={e => set('paymentTerms', e.target.value)}>
-                    <option value="">Select days</option>
-                    <option value="15">15</option>
-                    <option value="30">30</option>
-                    <option value="45">45</option>
-                    <option value="60">60</option>
-                    <option value="90">90</option>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Payment Terms <span className="text-rose-500">*</span></label>
+                  <select className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.paymentTerms} onChange={e => set('paymentTerms', e.target.value)}>
+                    <option value="">Select Terms</option>
+                    <option value="15">Net 15 Days</option>
+                    <option value="30">Net 30 Days</option>
+                    <option value="45">Net 45 Days</option>
+                    <option value="60">Net 60 Days</option>
+                    <option value="90">Net 90 Days</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-red-500 mb-1">City</label>
-                  <input type="text" className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.city} onChange={e => set('city', e.target.value)} />
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">City <span className="text-rose-500">*</span></label>
+                  <input type="text" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.city} onChange={e => set('city', e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-gray-700 mb-1">Zip Code</label>
-                  <input type="text" className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.zipCode} onChange={e => set('zipCode', e.target.value)} />
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Zip Code</label>
+                  <input type="text" className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.zipCode} onChange={e => set('zipCode', e.target.value)} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-red-500 mb-1">Country</label>
-                  <select className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.country} onChange={e => {
-                    set('country', e.target.value);
-                    set('state', '');
-                  }}>
-                    <option value="">Please Select</option>
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Country <span className="text-rose-500">*</span></label>
+                  <select className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.country} onChange={e => handleCountryChange(e.target.value)}>
+                    <option value="">Select Country</option>
                     {FULL_COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-red-500 mb-1">State</label>
-                  <select className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.state} onChange={e => set('state', e.target.value)}>
-                    <option value="">Please Select</option>
-                    {form.country && (() => {
-                      const selectedC = Country.getAllCountries().find(c => c.name === form.country);
-                      return selectedC ? State.getStatesOfCountry(selectedC.isoCode).map(s => (
-                        <option key={s.isoCode || s.name} value={s.name}>{s.name}</option>
-                      )) : null;
-                    })()}
+                  <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider mb-1.5">State / Province</label>
+                  <select className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" value={form.state} onChange={e => set('state', e.target.value)}>
+                    <option value="">Select State</option>
+                    {getStates().map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-gray-700 mb-1">Status</label>
-                  <select className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.status} onChange={e => set('status', e.target.value)}>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-1">Check Proxy?</label>
-                  <select className="w-full border p-2 rounded focus:outline-none focus:border-blue-500" value={form.checkProxy} onChange={e => set('checkProxy', e.target.value)}>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-1">Is DIY?</label>
-                  <select className="w-full border border-blue-300 bg-blue-50 p-2 rounded focus:outline-none focus:border-blue-500" value={form.isDiy} onChange={e => set('isDiy', e.target.value)}>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex space-x-2 pt-2">
-                <button onClick={handleSave} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded font-medium flex items-center">
-                  <Save size={16} className="mr-2" /> Save
+              <div className="flex items-center space-x-2.5 pt-4">
+                <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-semibold text-xs shadow-xs hover:shadow transition flex items-center">
+                  <Save size={14} className="mr-1.5" /> Save Company
                 </button>
-                <button onClick={() => setShowForm(false)} className="border border-red-400 text-red-500 hover:bg-red-50 px-4 py-2 rounded font-medium">
+                <button onClick={() => setShowForm(false)} className="px-4 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-semibold text-xs transition">
                   Cancel
                 </button>
               </div>
@@ -277,74 +285,105 @@ function Companies() {
             </div>
 
             {/* Right Column (1/3 width) - End Links */}
-            <div className="lg:col-span-1 space-y-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">End Links</h3>
+            <div className="lg:col-span-1 space-y-4 bg-slate-50/60 p-5 rounded-2xl border border-slate-200/80">
+              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">Default Postback End Links</h3>
               <div>
-                <label className="block text-gray-700 mb-1">Complete Link</label>
-                <textarea className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 h-20" value={form.completeLink} onChange={e => set('completeLink', e.target.value)}></textarea>
+                <label className="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Complete Link</label>
+                <textarea className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 h-20" value={form.completeLink} onChange={e => set('completeLink', e.target.value)}></textarea>
               </div>
               <div>
-                <label className="block text-gray-700 mb-1">Disqualify Link</label>
-                <textarea className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 h-20" value={form.disqualifyLink} onChange={e => set('disqualifyLink', e.target.value)}></textarea>
+                <label className="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Disqualify Link</label>
+                <textarea className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 h-20" value={form.disqualifyLink} onChange={e => set('disqualifyLink', e.target.value)}></textarea>
               </div>
               <div>
-                <label className="block text-gray-700 mb-1">Quotafull Link</label>
-                <textarea className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 h-20" value={form.quotafullLink} onChange={e => set('quotafullLink', e.target.value)}></textarea>
+                <label className="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Quotafull Link</label>
+                <textarea className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 h-20" value={form.quotafullLink} onChange={e => set('quotafullLink', e.target.value)}></textarea>
               </div>
               <div>
-                <label className="block text-gray-700 mb-1">Security Term Link</label>
-                <textarea className="w-full border p-2 rounded focus:outline-none focus:border-blue-500 h-20" value={form.securityTermLink} onChange={e => set('securityTermLink', e.target.value)}></textarea>
+                <label className="block text-[11px] font-semibold text-slate-600 uppercase mb-1">Security Term Link</label>
+                <textarea className="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 h-20" value={form.securityTermLink} onChange={e => set('securityTermLink', e.target.value)}></textarea>
               </div>
             </div>
 
           </div>
         </div>
       ) : (
-        <div className="bg-white p-4 rounded shadow-sm">
-          {loading ? <Loader /> : <div className="overflow-x-auto border rounded mt-4">
-            <table className="w-full text-left text-xs whitespace-nowrap">
-              <thead className="bg-gray-100 border-b text-gray-600">
-                <tr>
-                  <th className="p-3 font-semibold">Company Name</th>
-                  <th className="p-3 font-semibold">Type</th>
-                  <th className="p-3 font-semibold">Contact No</th>
-                  <th className="p-3 font-semibold">Email</th>
-                  <th className="p-3 font-semibold">Country</th>
-                  <th className="p-3 font-semibold">Status</th>
-                  <th className="p-3 font-semibold">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {companies.map(c => (
-                  <tr key={c._id} className="border-b hover:bg-gray-50">
-                    <td className="p-3">{c.name}</td>
-                    <td className="p-3">{c.companyType}</td>
-                    <td className="p-3">{c.contactNumber}</td>
-                    <td className="p-3">{c.email}</td>
-                    <td className="p-3">{c.country}</td>
-                    <td className="p-3">
-                      <span className={`px-2 py-0.5 rounded text-xs font-semibold ${c.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
-                        {c.status}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      <span className="cursor-pointer text-gray-400 hover:text-blue-500 mr-3 inline-flex items-center" onClick={() => openEdit(c)}><Edit size={16} /></span>
-                      <span className="cursor-pointer text-gray-400 hover:text-red-500 inline-flex items-center" onClick={() => handleDelete(c._id)}><Trash2 size={16} /></span>
-                    </td>
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+          
+          <div className="p-4 border-b border-slate-200/80 flex items-center justify-between">
+            <div className="relative max-w-sm w-full">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                className="w-full pl-8 pr-3 py-1.5 border border-slate-200 bg-slate-50 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20" 
+                placeholder="Search companies..."
+                value={search} 
+                onChange={e => setSearch(e.target.value)} 
+              />
+            </div>
+            <span className="text-xs text-slate-500">{filtered.length} total</span>
+          </div>
+
+          {loading ? (
+            <div className="py-12"><Loader /></div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs whitespace-nowrap">
+                <thead className="bg-slate-50/75 border-b border-slate-200/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                  <tr>
+                    <th className="py-3 px-4">Company Name</th>
+                    <th className="py-3 px-4">Type</th>
+                    <th className="py-3 px-4">Contact</th>
+                    <th className="py-3 px-4">Email</th>
+                    <th className="py-3 px-4">Country</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
-                ))}
-                {companies.length === 0 && (
-                  <tr><td colSpan="7" className="p-4 text-center text-gray-500">No companies found. Add one above.</td></tr>
-                )}
-              </tbody>
-            </table></div>}
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filtered.map(c => (
+                    <tr key={c._id} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="py-3 px-4 font-semibold text-slate-900">{c.name}</td>
+                      <td className="py-3 px-4">
+                        <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium border border-slate-200">
+                          {c.companyType}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-600 font-mono text-[11px]">{c.contactNumber}</td>
+                      <td className="py-3 px-4 text-slate-600">{c.email}</td>
+                      <td className="py-3 px-4 text-slate-600">{c.country}</td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
+                          c.status === 'Active' 
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                            : 'bg-rose-50 text-rose-700 border border-rose-200'
+                        }`}>
+                          <span className={`w-1 h-1 rounded-full ${c.status === 'Active' ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                          {c.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end space-x-1">
+                          <button onClick={() => openEdit(c)} className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-slate-100 transition" title="Edit">
+                            <Edit size={14} />
+                          </button>
+                          <button onClick={() => handleDelete(c._id)} className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition" title="Delete">
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {filtered.length === 0 && (
+                    <tr><td colSpan={7} className="py-10 text-center text-slate-400">No companies found.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
-      
     </div>
   );
 }
 
 export default Companies;
-
-

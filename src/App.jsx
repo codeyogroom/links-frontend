@@ -23,14 +23,22 @@ import AnalysisReports from './components/AnalysisReports';
 
 function Layout({ children, setAuth }) {
   return (
-    <div className="min-h-screen bg-[#f4f6f9] flex flex-col">
+    <div className="min-h-screen bg-slate-50/60 flex flex-col selection:bg-blue-600 selection:text-white">
       <Navbar setAuth={setAuth} />
-      <div className="flex-1 p-4 md:p-6 overflow-auto">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {children}
-      </div>
-      <footer className="bg-white border-t p-4 flex justify-between text-xs text-gray-500 font-medium">
-        <span>Copyright &copy; 2026 Talk To Panel.</span>
-        <span>Powered By : veritasInsights</span>
+      </main>
+      <footer className="bg-white/80 backdrop-blur-xs border-t border-slate-200/80 py-4 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-slate-500 font-medium">
+          <div className="flex items-center space-x-2">
+            <span>&copy; {new Date().getFullYear()} Talk To Panel Inc. All rights reserved.</span>
+          </div>
+          <div className="flex items-center space-x-1.5 text-slate-400">
+            <span>Powered by</span>
+            <span className="font-semibold text-slate-700">VeritasInsights Engine</span>
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 ml-1" title="System operational"></span>
+          </div>
+        </div>
       </footer>
     </div>
   );

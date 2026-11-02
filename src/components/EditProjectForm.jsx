@@ -158,58 +158,94 @@ function EditProjectForm() {
   };
 
   return (
-    <div className="pt-4">
+    <div className="space-y-6">
       {/* Action Buttons Row */}
-      <div className="bg-white border-b px-4 py-3 flex items-center justify-between text-xs shadow-sm mb-4">
-         <div className="flex space-x-2">
-            <button onClick={() => setShowEndPagesModal(true)} className="bg-[#4eb3f7] hover:bg-blue-400 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><FileText size={14} className="mr-1"/> End Pages</button>
-            <button onClick={() => setShowLinkCodesModal(true)} className="bg-[#128a8a] hover:bg-teal-600 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><LinkIcon size={14} className="mr-1"/> Link Codes</button>
-            <button onClick={() => setShowRedirectStatusModal(true)} className="bg-[#5c6e80] hover:bg-gray-600 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><AlertCircle size={14} className="mr-1"/> Redirect Status ID(s)</button>
-            <button className="bg-[#ff8a65] hover:bg-orange-500 text-white px-3 py-1.5 rounded font-bold flex items-center shadow-sm"><Mail size={14} className="mr-1"/> RFQ</button>
+      <div className="bg-white rounded-2xl border border-slate-200/80 p-4 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+         <div className="flex flex-wrap items-center gap-2">
+            <button 
+              onClick={() => setShowEndPagesModal(true)} 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center shadow-xs transition-all"
+            >
+              <FileText size={14} className="mr-1.5"/> End Pages
+            </button>
+            <button 
+              onClick={() => setShowLinkCodesModal(true)} 
+              className="bg-teal-600 hover:bg-teal-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center shadow-xs transition-all"
+            >
+              <LinkIcon size={14} className="mr-1.5"/> Link Codes
+            </button>
+            <button 
+              onClick={() => setShowRedirectStatusModal(true)} 
+              className="bg-slate-700 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center shadow-xs transition-all"
+            >
+              <AlertCircle size={14} className="mr-1.5"/> Redirect Status ID(s)
+            </button>
+            <button 
+              className="bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center shadow-xs transition-all"
+            >
+              <Mail size={14} className="mr-1.5"/> RFQ
+            </button>
          </div>
-         <div className="flex items-center space-x-4">
-             <span className="font-bold text-gray-700">True Up :</span>
-             <span className="bg-green-100 text-green-700 px-4 py-1 rounded font-bold border border-green-200 uppercase">{formData.status}</span>
+         <div className="flex items-center space-x-2 text-xs">
+             <span className="font-semibold text-slate-500">True Up Status:</span>
+             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase tracking-wider text-[11px]">
+               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+               {formData.status}
+             </span>
          </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 pb-12 flex space-x-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         
         {/* LEFT COLUMN - ACCORDION FORM */}
-        <div className="flex-1 bg-white p-6 shadow-sm border rounded">
-           <div className="space-y-4">
+        <div className="flex-1 space-y-4">
             
             {/* 1. Setup Requirements */}
-            <div className="border rounded">
-              <div className="bg-gray-50 p-3 flex justify-between items-center cursor-pointer text-sm font-bold text-gray-700" onClick={() => toggleSection('setup')}>
-                <span>Setup Requirements</span>
-                {openSections.setup ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+              <div 
+                className="bg-slate-50/80 px-5 py-3.5 flex justify-between items-center cursor-pointer text-xs font-bold text-slate-800 hover:bg-slate-100/70 transition-colors border-b border-slate-200/80" 
+                onClick={() => toggleSection('setup')}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                  Setup Requirements
+                </span>
+                {openSections.setup ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
               </div>
               {openSections.setup && (
-                <div className="p-4 space-y-4 text-xs">
+                <div className="p-5 space-y-4 text-xs">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label className="block text-gray-600 mb-1">Project Name</label><input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                    <div><label className="block text-gray-600 mb-1">Parent Project</label><select name="parentProjectId" value={formData.parentProjectId} onChange={handleChange} className="w-full border p-2 rounded"><option value="">Self Parent</option>{allProjects.filter(p => p._id !== id).map(p => <option key={p._id} value={p._id}>{p.name}</option>)}</select></div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Project Name</label>
+                      <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Parent Project</label>
+                      <select name="parentProjectId" value={formData.parentProjectId} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                        <option value="">Self Parent</option>
+                        {allProjects.filter(p => p._id !== id).map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+                      </select>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-gray-600 mb-1">Study Type</label>
-                      <select name="studyTypeId" value={formData.studyTypeId} onChange={handleChange} className="w-full border p-2 rounded">
+                      <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Study Type</label>
+                      <select name="studyTypeId" value={formData.studyTypeId} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
                         <option value="">Please Select</option>
                         {studyTypes.map(st => <option key={st._id} value={st._id}>{st.name}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-gray-600 mb-1">Country</label>
-                      <select name="country" value={formData.country} onChange={handleChange} className="w-full border p-2 rounded">
+                      <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Country</label>
+                      <select name="country" value={formData.country} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
                         <option value="">Select Country</option>
                         {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-gray-600 mb-1">Language</label>
-                      <select name="language" value={formData.language} onChange={handleChange} className="w-full border p-2 rounded">
+                      <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Language</label>
+                      <select name="language" value={formData.language} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
                         <option value="">Select Language</option>
                         {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
                       </select>
@@ -217,48 +253,72 @@ function EditProjectForm() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div><label className="block text-gray-600 mb-1">CPC $</label><input type="number" step="0.01" name="cpc" value={formData.cpc} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                    <div><label className="block text-gray-600 mb-1">Vendor Max CPC $</label><input type="number" step="0.01" name="vendorMaxCpc" value={formData.vendorMaxCpc} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                    <div><label className="block text-gray-600 mb-1">Invoice Currency</label><select name="invoiceCurrency" value={formData.invoiceCurrency} onChange={handleChange} className="w-full border p-2 rounded"><option>US Dollar</option></select></div>
-                    <div><label className="block text-gray-600 mb-1">Conversion Rate</label><input type="number" step="0.01" name="conversionRate" value={formData.conversionRate} onChange={handleChange} className="w-full border p-2 rounded" /></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">CPC $</label><input type="number" step="0.01" name="cpc" value={formData.cpc} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Vendor Max CPC $</label><input type="number" step="0.01" name="vendorMaxCpc" value={formData.vendorMaxCpc} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Invoice Currency</label><select name="invoiceCurrency" value={formData.invoiceCurrency} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option>US Dollar</option></select></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Conversion Rate</label><input type="number" step="0.01" name="conversionRate" value={formData.conversionRate} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label className="block text-gray-600 mb-1">Survey Friendly Name</label><input type="text" name="surveyFriendlyName" value={formData.surveyFriendlyName} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div><label className="block text-gray-600 mb-1">PV $</label><input type="number" step="0.01" name="pv" value={formData.pv} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                        <div><label className="block text-gray-600 mb-1">Setup Cost $</label><input type="number" step="0.01" name="setupCost" value={formData.setupCost} onChange={handleChange} className="w-full border p-2 rounded" /></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Survey Friendly Name</label><input type="text" name="surveyFriendlyName" value={formData.surveyFriendlyName} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
+                    <div className="grid grid-cols-2 gap-2">
+                        <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">PV $</label><input type="number" step="0.01" name="pv" value={formData.pv} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
+                        <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Setup Cost $</label><input type="number" step="0.01" name="setupCost" value={formData.setupCost} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label className="block text-gray-600 mb-1">Survey Link</label><textarea name="surveyLink" value={formData.surveyLink} onChange={handleChange} className="w-full border p-2 rounded h-20 text-[10px]"></textarea></div>
-                    <div><label className="block text-gray-600 mb-1">Survey Test Link</label><textarea name="surveyTestLink" value={formData.surveyTestLink} onChange={handleChange} className="w-full border p-2 rounded h-20 text-[10px]"></textarea></div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Survey Link</label>
+                      <textarea name="surveyLink" value={formData.surveyLink} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-2.5 h-20 text-[11px] font-mono text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-y"></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Survey Test Link</label>
+                      <textarea name="surveyTestLink" value={formData.surveyTestLink} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-2.5 h-20 text-[11px] font-mono text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-y"></textarea>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
             {/* 2. Expected Metrics & Data */}
-            <div className="border rounded">
-              <div className="bg-gray-50 p-3 flex justify-between items-center cursor-pointer text-sm font-bold text-gray-700" onClick={() => toggleSection('metrics')}>
-                <span>Expected Metrics & Data</span>
-                {openSections.metrics ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+              <div 
+                className="bg-slate-50/80 px-5 py-3.5 flex justify-between items-center cursor-pointer text-xs font-bold text-slate-800 hover:bg-slate-100/70 transition-colors border-b border-slate-200/80" 
+                onClick={() => toggleSection('metrics')}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  Expected Metrics & Data
+                </span>
+                {openSections.metrics ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
               </div>
               {openSections.metrics && (
-                <div className="p-4 space-y-4 text-xs">
+                <div className="p-5 space-y-4 text-xs">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label className="block text-gray-600 mb-1">Req. Completes :</label><input type="number" name="reqCompletes" value={formData.reqCompletes} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                    <div><label className="block text-gray-600 mb-1">Max. Completes</label><select name="maxCompletes" value={formData.maxCompletes} onChange={handleChange} className="w-full border p-2 rounded"><option>No Max Limit</option></select></div>
-                    <div><label className="block text-gray-600 mb-1">LOI</label><input type="text" name="loi" value={formData.loi} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                    <div><label className="block text-gray-600 mb-1">IR</label><input type="number" name="ir" value={formData.ir} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                    <div><label className="block text-gray-600 mb-1"># of points to award</label><input type="number" name="pointsToAward" value={formData.pointsToAward} onChange={handleChange} className="w-full border p-2 rounded" /></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Req. Completes :</label><input type="number" name="reqCompletes" value={formData.reqCompletes} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Max. Completes</label><select name="maxCompletes" value={formData.maxCompletes} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option>No Max Limit</option></select></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">LOI (Length of Interview)</label><input type="text" name="loi" value={formData.loi} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">IR % (Incidence Rate)</label><input type="number" name="ir" value={formData.ir} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
+                    <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5"># of points to award</label><input type="number" name="pointsToAward" value={formData.pointsToAward} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
                     <div>
-                      <label className="block text-gray-600 mb-2">Supported Devices :</label>
-                      <div className="flex items-center space-x-4">
-                        <label className="flex items-center space-x-1 cursor-pointer"><input type="checkbox" checked={formData.supportedDevices.desktop} onChange={() => handleDeviceChange('desktop')} /><Monitor size={20} className={formData.supportedDevices.desktop ? 'text-blue-500' : 'text-gray-400'} /></label>
-                        <label className="flex items-center space-x-1 cursor-pointer"><input type="checkbox" checked={formData.supportedDevices.mobile} onChange={() => handleDeviceChange('mobile')} /><Smartphone size={20} className={formData.supportedDevices.mobile ? 'text-blue-500' : 'text-gray-400'} /></label>
-                        <label className="flex items-center space-x-1 cursor-pointer"><input type="checkbox" checked={formData.supportedDevices.tablet} onChange={() => handleDeviceChange('tablet')} /><Tablet size={20} className={formData.supportedDevices.tablet ? 'text-blue-500' : 'text-gray-400'} /></label>
+                      <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Supported Devices :</label>
+                      <div className="flex items-center space-x-5 pt-1">
+                        <label className="flex items-center space-x-1.5 cursor-pointer select-none">
+                          <input type="checkbox" checked={formData.supportedDevices.desktop} onChange={() => handleDeviceChange('desktop')} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                          <Monitor size={18} className={formData.supportedDevices.desktop ? 'text-blue-600' : 'text-slate-400'} />
+                          <span className="text-xs text-slate-700">Desktop</span>
+                        </label>
+                        <label className="flex items-center space-x-1.5 cursor-pointer select-none">
+                          <input type="checkbox" checked={formData.supportedDevices.mobile} onChange={() => handleDeviceChange('mobile')} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                          <Smartphone size={18} className={formData.supportedDevices.mobile ? 'text-blue-600' : 'text-slate-400'} />
+                          <span className="text-xs text-slate-700">Mobile</span>
+                        </label>
+                        <label className="flex items-center space-x-1.5 cursor-pointer select-none">
+                          <input type="checkbox" checked={formData.supportedDevices.tablet} onChange={() => handleDeviceChange('tablet')} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                          <Tablet size={18} className={formData.supportedDevices.tablet ? 'text-blue-600' : 'text-slate-400'} />
+                          <span className="text-xs text-slate-700">Tablet</span>
+                        </label>
                       </div>
                     </div>
                   </div>
@@ -267,54 +327,72 @@ function EditProjectForm() {
             </div>
 
             {/* 3. People */}
-            <div className="border rounded">
-              <div className="bg-gray-50 p-3 flex justify-between items-center cursor-pointer text-sm font-bold text-gray-700" onClick={() => toggleSection('people')}>
-                <span>People</span>
-                {openSections.people ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+              <div 
+                className="bg-slate-50/80 px-5 py-3.5 flex justify-between items-center cursor-pointer text-xs font-bold text-slate-800 hover:bg-slate-100/70 transition-colors border-b border-slate-200/80" 
+                onClick={() => toggleSection('people')}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                  People & Assignments
+                </span>
+                {openSections.people ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
               </div>
               {openSections.people && (
-                <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                   <div>
-                    <label className="block text-gray-600 mb-1">Client</label>
-                    <select name="clientId" value={formData.clientId} onChange={handleChange} className="w-full border p-2 rounded">
+                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Client</label>
+                    <select name="clientId" value={formData.clientId} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
                       <option value="">Please Select</option>
                       {clients.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                     </select>
                   </div>
-                  <div><label className="block text-gray-600 mb-1">Client Contact</label><select name="clientContactId" value={formData.clientContactId} onChange={handleChange} className="w-full border p-2 rounded"><option value="">Select Client Contact</option></select></div>
-                  <div><label className="block text-gray-600 mb-1">Project Manager</label><select name="projectManager" value={formData.projectManager} onChange={handleChange} className="w-full border p-2 rounded"><option>Admin TTP</option></select></div>
-                  <div><label className="block text-gray-600 mb-1">Sales Person</label><select name="salesPerson" value={formData.salesPerson} onChange={handleChange} className="w-full border p-2 rounded"><option>Admin TTP</option></select></div>
+                  <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Client Contact</label><select name="clientContactId" value={formData.clientContactId} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option value="">Select Client Contact</option></select></div>
+                  <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Project Manager</label><select name="projectManager" value={formData.projectManager} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option>Admin TTP</option></select></div>
+                  <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Sales Person</label><select name="salesPerson" value={formData.salesPerson} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option>Admin TTP</option></select></div>
                 </div>
               )}
             </div>
 
             {/* 4. Timeline */}
-            <div className="border rounded">
-              <div className="bg-gray-50 p-3 flex justify-between items-center cursor-pointer text-sm font-bold text-gray-700" onClick={() => toggleSection('timeline')}>
-                <span>Timeline</span>
-                {openSections.timeline ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+              <div 
+                className="bg-slate-50/80 px-5 py-3.5 flex justify-between items-center cursor-pointer text-xs font-bold text-slate-800 hover:bg-slate-100/70 transition-colors border-b border-slate-200/80" 
+                onClick={() => toggleSection('timeline')}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                  Timeline
+                </span>
+                {openSections.timeline ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
               </div>
               {openSections.timeline && (
-                <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div><label className="block text-gray-600 mb-1">Start Date</label><input type="date" name="startDate" value={formData.startDate} onChange={handleChange} className="w-full border p-2 rounded" /></div>
-                  <div><label className="block text-gray-600 mb-1">End Date</label><input type="date" name="endDate" value={formData.endDate} onChange={handleChange} className="w-full border p-2 rounded" /></div>
+                <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                  <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Start Date</label><input type="date" name="startDate" value={formData.startDate} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
+                  <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">End Date</label><input type="date" name="endDate" value={formData.endDate} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" /></div>
                 </div>
               )}
             </div>
 
             {/* 5. Memorandum */}
-            <div className="border rounded">
-              <div className="bg-gray-50 p-3 flex justify-between items-center cursor-pointer text-sm font-bold text-gray-700" onClick={() => toggleSection('memo')}>
-                <span>Memorandum</span>
-                {openSections.memo ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+              <div 
+                className="bg-slate-50/80 px-5 py-3.5 flex justify-between items-center cursor-pointer text-xs font-bold text-slate-800 hover:bg-slate-100/70 transition-colors border-b border-slate-200/80" 
+                onClick={() => toggleSection('memo')}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                  Memorandum & Invoicing Notes
+                </span>
+                {openSections.memo ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
               </div>
               {openSections.memo && (
-                <div className="p-4 space-y-4 text-xs">
+                <div className="p-5 space-y-4 text-xs">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label className="block text-gray-600 mb-1">Notes</label><textarea name="notes" value={formData.notes} onChange={handleChange} className="w-full border p-2 rounded h-24"></textarea></div>
-                    <div><label className="block text-gray-600 mb-1">Project Brief (All Partner)</label><textarea name="projectBrief" value={formData.projectBrief} onChange={handleChange} className="w-full border p-2 rounded h-24"></textarea></div>
+                      <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Notes</label><textarea name="notes" value={formData.notes} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 h-24 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-y"></textarea></div>
+                      <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Project Brief (All Partner)</label><textarea name="projectBrief" value={formData.projectBrief} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 h-24 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-y"></textarea></div>
                     </div>
-                    <div className="bg-gray-50 p-3 rounded border text-gray-600 leading-tight">
+                    <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 text-slate-600 font-mono text-[11px] leading-relaxed">
                         Notes For Project Invoicing:<br/>
                         PO: {`{{PO Number}}`}<br/>
                         CID: {`{{CID Number}}`}<br/>
@@ -326,153 +404,172 @@ function EditProjectForm() {
             </div>
 
             {/* 6. Status */}
-            <div className="border rounded mb-4">
-              <div className="bg-gray-50 p-3 flex justify-between items-center cursor-pointer text-sm font-bold text-gray-700" onClick={() => toggleSection('status')}>
-                <span>Status</span>
-                {openSections.status ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+              <div 
+                className="bg-slate-50/80 px-5 py-3.5 flex justify-between items-center cursor-pointer text-xs font-bold text-slate-800 hover:bg-slate-100/70 transition-colors border-b border-slate-200/80" 
+                onClick={() => toggleSection('status')}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  Status & Invoicing
+                </span>
+                {openSections.status ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
               </div>
               {openSections.status && (
-                <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                  <div><label className="block text-gray-600 mb-1">Status</label><select name="status" value={formData.status} onChange={handleChange} className="w-full border p-2 rounded"><option>Running</option><option>Closed</option></select></div>
-                  <div><label className="block text-gray-600 mb-1">Invoice Status</label><select className="w-full border p-2 rounded"><option>Pending</option></select></div>
-                  <div><label className="block text-gray-600 mb-1">Invoice Number</label><input type="text" className="w-full border p-2 rounded" value="0" readOnly /></div>
+                <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                  <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Project Status</label><select name="status" value={formData.status} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option>Running</option><option>Closed</option></select></div>
+                  <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Invoice Status</label><select className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option>Pending</option></select></div>
+                  <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Invoice Number</label><input type="text" className="w-full bg-slate-100 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-500 cursor-not-allowed" value="0" readOnly /></div>
                 </div>
               )}
             </div>
             
             {/* Form Footer Buttons */}
-            <div className="flex space-x-2 pt-2 pb-4">
-              <button onClick={handleUpdate} className="bg-[#4eb3f7] hover:bg-blue-400 text-white px-5 py-1.5 rounded text-sm font-bold shadow-sm">Update</button>
-              <button className="bg-[#5c6e80] hover:bg-gray-600 text-white px-5 py-1.5 rounded text-sm font-bold shadow-sm">Clone</button>
-              <button onClick={() => navigate('/projects')} className="bg-white border border-red-300 text-red-500 hover:bg-red-50 px-5 py-1.5 rounded text-sm font-bold shadow-sm">Cancel</button>
+            <div className="flex items-center gap-2 pt-2">
+              <button onClick={handleUpdate} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-semibold shadow-xs hover:shadow transition-all">Save Changes</button>
+              <button className="bg-slate-700 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-xs font-semibold shadow-xs hover:shadow transition-all">Clone Project</button>
+              <button onClick={() => navigate('/projects')} className="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all">Cancel</button>
             </div>
 
-            {/* Change Log */}
-            <div className="border rounded mb-6">
-              <div className="bg-white p-3 flex justify-between items-center cursor-pointer text-sm text-gray-700" onClick={() => toggleSection('changeLog')}>
-                <span>Change Log</span>
-                {openSections.changeLog ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              </div>
-            </div>
-
-           </div>
         </div>
 
         {/* RIGHT COLUMN - SIDEBAR */}
-        <div className="w-80 flex flex-col space-y-6">
+        <div className="w-full lg:w-80 flex flex-col space-y-6">
             
             {/* Security Panel */}
-            <div className="bg-white border rounded shadow-sm">
-                <div className="bg-gray-50 border-b p-3 text-sm font-bold text-gray-700">Basic Security</div>
-                <div className="p-4 text-xs space-y-3">
-                    <label className="flex justify-between items-center text-green-600 cursor-pointer">Validate Blank Referrer <input type="checkbox" name="validateBlankReferrer" checked={security.validateBlankReferrer} onChange={handleSecurityChange}/></label>
-                    <label className="flex justify-between items-center text-green-600 cursor-pointer">Validate Start/End IP <input type="checkbox" name="validateStartEndIp" checked={security.validateStartEndIp} onChange={handleSecurityChange}/></label>
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div className="bg-slate-50/80 border-b border-slate-200/80 px-5 py-3.5 text-xs font-bold text-slate-800 flex items-center gap-2">
+                  <Shield size={15} className="text-blue-600" />
+                  Security Engine Controls
+                </div>
+                <div className="p-5 text-xs space-y-3.5">
+                    <label className="flex justify-between items-center text-slate-700 font-medium cursor-pointer">
+                      <span>Validate Blank Referrer</span> 
+                      <input type="checkbox" name="validateBlankReferrer" checked={security.validateBlankReferrer} onChange={handleSecurityChange} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                    </label>
+                    <label className="flex justify-between items-center text-slate-700 font-medium cursor-pointer">
+                      <span>Validate Start/End IP</span> 
+                      <input type="checkbox" name="validateStartEndIp" checked={security.validateStartEndIp} onChange={handleSecurityChange} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                    </label>
                     
-                    <div className="pt-2 border-t mt-2">
-                        <div className="flex justify-between text-[#4b8df8] font-bold mb-2">veritasIdentity <span className="text-green-500 font-normal">$ Billed Monthly</span></div>
-                        <label className="flex justify-between items-center text-gray-800 font-medium cursor-pointer mb-2">Device Validation <input type="checkbox" name="deviceValidation" checked={security.deviceValidation} onChange={handleSecurityChange}/></label>
-                        <label className="flex justify-between items-center text-gray-800 font-medium cursor-pointer mb-2">Geographic Validation <input type="checkbox" name="geographicValidation" checked={security.geographicValidation} onChange={handleSecurityChange}/></label>
+                    <div className="pt-3 border-t border-slate-100">
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="text-blue-600 font-bold text-xs flex items-center gap-1"><ShieldCheck size={14} /> veritasIdentity</span>
+                          <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">Active</span>
+                        </div>
                         
-                        <label className="flex justify-between items-center text-gray-800 font-medium cursor-pointer mb-1 mt-3">Traffic Anonymization Controls <input type="checkbox" name="trafficAnonymization" checked={security.trafficAnonymization} onChange={handleSecurityChange}/></label>
-                        <p className="text-[9px] text-gray-500 mb-2 leading-tight">VPN/Proxy Detection</p>
+                        <label className="flex justify-between items-center text-slate-700 font-medium cursor-pointer mb-2.5">
+                          <span>Device Validation</span> 
+                          <input type="checkbox" name="deviceValidation" checked={security.deviceValidation} onChange={handleSecurityChange} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                        </label>
+                        <label className="flex justify-between items-center text-slate-700 font-medium cursor-pointer mb-2.5">
+                          <span>Geographic Validation</span> 
+                          <input type="checkbox" name="geographicValidation" checked={security.geographicValidation} onChange={handleSecurityChange} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                        </label>
                         
-                        <label className="flex justify-between items-center text-gray-800 font-medium cursor-pointer mb-1">Threat Intelligence <input type="checkbox" name="threatIntelligence" checked={security.threatIntelligence} onChange={handleSecurityChange}/></label>
-                        <p className="text-[9px] text-gray-500 mb-2 leading-tight">Known Threat Sources, Malicious Actor Detection, Tor Network Detection</p>
+                        <div className="mt-3">
+                          <label className="flex justify-between items-center text-slate-700 font-medium cursor-pointer mb-0.5">
+                            <span>Traffic Anonymization</span> 
+                            <input type="checkbox" name="trafficAnonymization" checked={security.trafficAnonymization} onChange={handleSecurityChange} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                          </label>
+                          <p className="text-[10px] text-slate-400">VPN / Proxy Detection</p>
+                        </div>
                         
-                        <label className="flex justify-between items-center text-gray-800 font-medium cursor-pointer mb-1">Bot & Automated Traffic Detection <input type="checkbox" name="botDetection" checked={security.botDetection} onChange={handleSecurityChange}/></label>
-                        <p className="text-[9px] text-gray-500 mb-2 leading-tight">Anonymous Traffic Detection</p>
+                        <div className="mt-2.5">
+                          <label className="flex justify-between items-center text-slate-700 font-medium cursor-pointer mb-0.5">
+                            <span>Threat Intelligence</span> 
+                            <input type="checkbox" name="threatIntelligence" checked={security.threatIntelligence} onChange={handleSecurityChange} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                          </label>
+                          <p className="text-[10px] text-slate-400">Tor Network, Malicious Actor Detection</p>
+                        </div>
+                        
+                        <div className="mt-2.5">
+                          <label className="flex justify-between items-center text-slate-700 font-medium cursor-pointer mb-0.5">
+                            <span>Bot Detection</span> 
+                            <input type="checkbox" name="botDetection" checked={security.botDetection} onChange={handleSecurityChange} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                          </label>
+                          <p className="text-[10px] text-slate-400">Automated Traffic Interception</p>
+                        </div>
 
-                        <label className="flex justify-between items-center text-gray-800 font-medium cursor-pointer mt-3 pt-3 border-t">RDE/Profanity Check <input type="checkbox" name="rdeProfanityCheck" checked={security.rdeProfanityCheck} onChange={handleSecurityChange}/></label>
+                        <label className="flex justify-between items-center text-slate-700 font-medium cursor-pointer mt-3 pt-3 border-t border-slate-100">
+                          <span>RDE / Profanity Check</span> 
+                          <input type="checkbox" name="rdeProfanityCheck" checked={security.rdeProfanityCheck} onChange={handleSecurityChange} className="rounded border-slate-300 text-blue-600 focus:ring-0" />
+                        </label>
                     </div>
                 </div>
             </div>
 
             {/* Statistics Panel */}
-            <div className="bg-white border rounded shadow-sm">
-              <div className="bg-gray-50 border-b p-3 font-bold text-gray-700 text-sm">Statistics</div>
-              <div className="p-4 text-center text-xs">
+            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+              <div className="bg-slate-50/80 border-b border-slate-200/80 px-5 py-3.5 font-bold text-slate-800 text-xs flex items-center gap-2">
+                <Activity size={15} className="text-blue-600" />
+                Live Session Telemetry
+              </div>
+              <div className="p-5 text-center text-xs">
                 
                 {/* Row 1 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
-                  <div>
-                    <p className="text-gray-500 mb-1">Total Hits</p>
-                    <p className="text-xl text-blue-500 font-light">{stats.totalHits}</p>
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Hits</p>
+                    <p className="text-lg font-bold text-slate-900">{stats.totalHits}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-500 mb-1">Redirects</p>
-                    <p className="text-xl text-blue-500 font-light">{stats.redirects}</p>
+                  <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Redirects</p>
+                    <p className="text-lg font-bold text-blue-600">{stats.redirects}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-500 mb-1">Blocked</p>
-                    <p className="text-xl text-red-600 font-light flex items-center justify-center">{stats.blocked} <ShieldAlert size={14} className="ml-1 text-red-500"/></p>
+                  <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Blocked</p>
+                    <p className="text-lg font-bold text-rose-600">{stats.blocked}</p>
                   </div>
                 </div>
 
                 {/* Row 2 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-                  <div>
-                    <p className="text-gray-500 mb-1">Completed</p>
-                    <p className="text-xl text-green-500 font-light">{stats.completed}</p>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  <div className="bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100">
+                    <p className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider mb-1">Completed</p>
+                    <p className="text-lg font-bold text-emerald-700">{stats.completed}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-500 mb-1">Disqualified</p>
-                    <p className="text-xl text-orange-500 font-light">{stats.disqualified}</p>
+                  <div className="bg-amber-50/60 p-2.5 rounded-xl border border-amber-100">
+                    <p className="text-[10px] font-semibold text-amber-700 uppercase tracking-wider mb-1">Disqualified</p>
+                    <p className="text-lg font-bold text-amber-700">{stats.disqualified}</p>
                   </div>
                 </div>
 
                 {/* Row 3 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-                  <div>
-                    <p className="text-gray-500 mb-1">Quota Full</p>
-                    <p className="text-xl text-yellow-600 font-light">{stats.quotaFull}</p>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Quota Full</p>
+                    <p className="text-base font-bold text-slate-800">{stats.quotaFull}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-500 mb-1">Security Terminate</p>
-                    <p className="text-xl text-red-500 font-light">{stats.securityTerminate}</p>
+                  <div className="bg-rose-50/60 p-2.5 rounded-xl border border-rose-100">
+                    <p className="text-[10px] font-semibold text-rose-700 uppercase tracking-wider mb-1">Security Term</p>
+                    <p className="text-base font-bold text-rose-700">{stats.securityTerminate}</p>
                   </div>
                 </div>
 
-                <hr className="my-4"/>
+                <div className="my-3 border-t border-slate-100" />
 
                 {/* Row 4 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
+                <div className="grid grid-cols-3 gap-2 mb-3">
                   <div>
-                    <p className="text-gray-500 mb-1">EPC</p>
-                    <p className="text-lg text-gray-800 font-light">${stats.epc}</p>
+                    <p className="text-[10px] text-slate-400 font-semibold uppercase">EPC</p>
+                    <p className="text-sm font-bold text-slate-800">${stats.epc}</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 mb-1">CR</p>
-                    <p className="text-lg text-gray-800 font-light">{stats.cr}%</p>
+                    <p className="text-[10px] text-slate-400 font-semibold uppercase">CR</p>
+                    <p className="text-sm font-bold text-slate-800">{stats.cr}%</p>
                   </div>
                   <div>
-                    <p className="text-gray-500 mb-1">IR</p>
-                    <p className="text-lg text-gray-800 font-light">{stats.ir}%</p>
-                  </div>
-                </div>
-
-                <hr className="my-4"/>
-
-                {/* Row 5 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
-                  <div>
-                    <p className="text-gray-500 mb-1">Average LOI</p>
-                    <p className="text-lg text-gray-800 font-light">{stats.avgLoi} <span className="text-xs">min</span></p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 mb-1">Median LOI</p>
-                    <p className="text-lg text-gray-800 font-light">{stats.medianLoi} <span className="text-xs">min</span></p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500 mb-1">Abandons</p>
-                    <p className="text-lg text-red-500 font-light">{stats.abandons}%</p>
+                    <p className="text-[10px] text-slate-400 font-semibold uppercase">IR</p>
+                    <p className="text-sm font-bold text-slate-800">{stats.ir}%</p>
                   </div>
                 </div>
 
-                <hr className="my-4"/>
+                <div className="my-3 border-t border-slate-100" />
 
-                <div className="text-left mt-2">
-                  <p className="text-gray-500 mb-1">Last Completed</p>
-                  <p className="text-sm font-bold text-gray-800">{stats.lastCompleted}</p>
+                <div className="text-left pt-1">
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Last Activity</p>
+                  <p className="text-xs font-bold text-slate-700 mt-0.5">{stats.lastCompleted}</p>
                 </div>
 
               </div>
@@ -484,13 +581,13 @@ function EditProjectForm() {
 
             {/* End Pages Modal */}
       {showEndPagesModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200">
+        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-200/80">
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h3 className="text-base font-bold text-gray-800">Redirect End Pages & Variables</h3>
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+              <h3 className="text-sm font-bold text-slate-900">Redirect End Pages & Variables</h3>
               <button 
-                className="text-gray-400 hover:text-gray-700 transition" 
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg transition" 
                 onClick={() => setShowEndPagesModal(false)}
               >
                 <X size={18} />
@@ -500,52 +597,52 @@ function EditProjectForm() {
             <div className="p-6 space-y-6 text-xs">
               {/* Section 1: End Links */}
               <div>
-                <h4 className="text-sm font-bold text-gray-800 border-b pb-1 mb-3">End Links</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 mb-3">End Links</h4>
                 <div className="space-y-3">
                   <div>
-                    <span className="font-bold text-green-600 block mb-0.5">Complete:</span>
-                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
-                      <code className="text-gray-700 break-all select-all font-mono">
+                    <span className="font-semibold text-emerald-600 block mb-1">Complete:</span>
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
+                      <code className="text-slate-800 break-all select-all font-mono text-[11px]">
                         {`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('1', id)}`}
                       </code>
-                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('1', id)}`, 'c1')} className="ml-2 text-gray-500 hover:text-blue-600">
-                        {copiedKey === 'c1' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('1', id)}`, 'c1')} className="ml-2 p-1 text-slate-400 hover:text-blue-600 rounded">
+                        {copiedKey === 'c1' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>
 
                   <div>
-                    <span className="font-bold text-red-500 block mb-0.5">Terminate:</span>
-                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
-                      <code className="text-gray-700 break-all select-all font-mono">
+                    <span className="font-semibold text-rose-600 block mb-1">Terminate:</span>
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
+                      <code className="text-slate-800 break-all select-all font-mono text-[11px]">
                         {`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('2', id)}`}
                       </code>
-                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('2', id)}`, 'c2')} className="ml-2 text-gray-500 hover:text-blue-600">
-                        {copiedKey === 'c2' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('2', id)}`, 'c2')} className="ml-2 p-1 text-slate-400 hover:text-blue-600 rounded">
+                        {copiedKey === 'c2' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>
 
                   <div>
-                    <span className="font-bold text-orange-500 block mb-0.5">Quota Full:</span>
-                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
-                      <code className="text-gray-700 break-all select-all font-mono">
+                    <span className="font-semibold text-amber-600 block mb-1">Quota Full:</span>
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
+                      <code className="text-slate-800 break-all select-all font-mono text-[11px]">
                         {`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('3', id)}`}
                       </code>
-                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('3', id)}`, 'c3')} className="ml-2 text-gray-500 hover:text-blue-600">
-                        {copiedKey === 'c3' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('3', id)}`, 'c3')} className="ml-2 p-1 text-slate-400 hover:text-blue-600 rounded">
+                        {copiedKey === 'c3' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>
 
                   <div>
-                    <span className="font-bold text-red-600 block mb-0.5">Security Term:</span>
-                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
-                      <code className="text-gray-700 break-all select-all font-mono">
+                    <span className="font-semibold text-rose-700 block mb-1">Security Term:</span>
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
+                      <code className="text-slate-800 break-all select-all font-mono text-[11px]">
                         {`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('4', id)}`}
                       </code>
-                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('4', id)}`, 'c4')} className="ml-2 text-gray-500 hover:text-blue-600">
-                        {copiedKey === 'c4' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&authToken=${getAuthToken('4', id)}`, 'c4')} className="ml-2 p-1 text-slate-400 hover:text-blue-600 rounded">
+                        {copiedKey === 'c4' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>
@@ -554,15 +651,15 @@ function EditProjectForm() {
 
               {/* Section 2: S2S Postback Link */}
               <div>
-                <h4 className="text-sm font-bold text-gray-800 border-b pb-1 mb-3">S2S Postback Link</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 mb-3">S2S Postback Link</h4>
                 <div>
-                  <span className="font-bold text-green-600 block mb-0.5">S2S Postback Link:</span>
-                  <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
-                    <code className="text-gray-700 break-all select-all font-mono">
+                  <span className="font-semibold text-emerald-600 block mb-1">S2S Postback Link:</span>
+                  <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
+                    <code className="text-slate-800 break-all select-all font-mono text-[11px]">
                       {`${serverBaseUrl}/redirect-postback/?pid=[[TTPID]]&status_id=[[status]]`}
                     </code>
-                    <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-postback/?pid=[[TTPID]]&status_id=[[status]]`, 's2s')} className="ml-2 text-gray-500 hover:text-blue-600">
-                      {copiedKey === 's2s' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                    <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-postback/?pid=[[TTPID]]&status_id=[[status]]`, 's2s')} className="ml-2 p-1 text-slate-400 hover:text-blue-600 rounded">
+                      {copiedKey === 's2s' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                     </button>
                   </div>
                 </div>
@@ -570,52 +667,52 @@ function EditProjectForm() {
 
               {/* Section 3: Static Links */}
               <div>
-                <h4 className="text-sm font-bold text-gray-800 border-b pb-1 mb-3">Static Links</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 border-b border-slate-100 pb-2 mb-3">Static Links</h4>
                 <div className="space-y-3">
                   <div>
-                    <span className="font-bold text-green-600 block mb-0.5">Complete:</span>
-                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
-                      <code className="text-gray-700 break-all select-all font-mono">
+                    <span className="font-semibold text-emerald-600 block mb-1">Complete:</span>
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
+                      <code className="text-slate-800 break-all select-all font-mono text-[11px]">
                         {`${serverBaseUrl}/redirect-process/?supp_code=55&status=1&pid=[[TTPID]]`}
                       </code>
-                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=1&pid=[[TTPID]]`, 'st1')} className="ml-2 text-gray-500 hover:text-blue-600">
-                        {copiedKey === 'st1' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=1&pid=[[TTPID]]`, 'st1')} className="ml-2 p-1 text-slate-400 hover:text-blue-600 rounded">
+                        {copiedKey === 'st1' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>
 
                   <div>
-                    <span className="font-bold text-red-500 block mb-0.5">Terminate:</span>
-                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
-                      <code className="text-gray-700 break-all select-all font-mono">
+                    <span className="font-semibold text-rose-600 block mb-1">Terminate:</span>
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
+                      <code className="text-slate-800 break-all select-all font-mono text-[11px]">
                         {`${serverBaseUrl}/redirect-process/?supp_code=55&status=2&pid=[[TTPID]]`}
                       </code>
-                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=2&pid=[[TTPID]]`, 'st2')} className="ml-2 text-gray-500 hover:text-blue-600">
-                        {copiedKey === 'st2' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=2&pid=[[TTPID]]`, 'st2')} className="ml-2 p-1 text-slate-400 hover:text-blue-600 rounded">
+                        {copiedKey === 'st2' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>
 
                   <div>
-                    <span className="font-bold text-orange-500 block mb-0.5">Quota Full:</span>
-                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
-                      <code className="text-gray-700 break-all select-all font-mono">
+                    <span className="font-semibold text-amber-600 block mb-1">Quota Full:</span>
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
+                      <code className="text-slate-800 break-all select-all font-mono text-[11px]">
                         {`${serverBaseUrl}/redirect-process/?supp_code=55&status=3&pid=[[TTPID]]`}
                       </code>
-                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=3&pid=[[TTPID]]`, 'st3')} className="ml-2 text-gray-500 hover:text-blue-600">
-                        {copiedKey === 'st3' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=3&pid=[[TTPID]]`, 'st3')} className="ml-2 p-1 text-slate-400 hover:text-blue-600 rounded">
+                        {copiedKey === 'st3' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>
 
                   <div>
-                    <span className="font-bold text-red-600 block mb-0.5">Security Term:</span>
-                    <div className="flex items-center justify-between bg-gray-50 border p-2 rounded">
-                      <code className="text-gray-700 break-all select-all font-mono">
+                    <span className="font-semibold text-rose-700 block mb-1">Security Term:</span>
+                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
+                      <code className="text-slate-800 break-all select-all font-mono text-[11px]">
                         {`${serverBaseUrl}/redirect-process/?supp_code=55&status=4&pid=[[TTPID]]`}
                       </code>
-                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=4&pid=[[TTPID]]`, 'st4')} className="ml-2 text-gray-500 hover:text-blue-600">
-                        {copiedKey === 'st4' ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+                      <button onClick={() => copyToClipboard(`${serverBaseUrl}/redirect-process/?supp_code=55&status=4&pid=[[TTPID]]`, 'st4')} className="ml-2 p-1 text-slate-400 hover:text-blue-600 rounded">
+                        {copiedKey === 'st4' ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                       </button>
                     </div>
                   </div>
@@ -624,12 +721,12 @@ function EditProjectForm() {
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-50 px-6 py-3 border-t flex justify-end">
+            <div className="bg-slate-50 px-6 py-3.5 border-t border-slate-100 flex justify-end">
               <button 
                 onClick={() => setShowEndPagesModal(false)}
-                className="bg-[#00b5ad] hover:bg-teal-600 text-white font-bold text-xs px-5 py-2 rounded shadow-sm transition"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-2 rounded-xl shadow-xs transition"
               >
-                Okay
+                Done
               </button>
             </div>
           </div>
@@ -638,13 +735,13 @@ function EditProjectForm() {
 
       {/* Link Codes Modal */}
       {showLinkCodesModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-gray-200">
+        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-slate-200/80">
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h3 className="text-base font-bold text-gray-800">Redirect End Pages & Variables</h3>
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+              <h3 className="text-sm font-bold text-slate-900">Redirect End Pages & Variables</h3>
               <button 
-                className="text-gray-400 hover:text-gray-700 transition" 
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg transition" 
                 onClick={() => setShowLinkCodesModal(false)}
               >
                 <X size={18} />
@@ -654,86 +751,86 @@ function EditProjectForm() {
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 text-xs">
               {/* Left Column: Client Link Variable */}
               <div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">Client Link Variable</h4>
-                <p className="text-gray-600 mb-2 leading-relaxed">
-                  These variables shall be used only in client survey link.The values of the variable shall be replaced in begin pages and then passed to client survey link url.
+                <h4 className="text-base font-bold text-slate-900 mb-1.5">Client Link Variable</h4>
+                <p className="text-slate-500 mb-2 leading-relaxed text-[11px]">
+                  These variables shall be used only in client survey link. The values will be replaced in begin pages and passed to client survey URL.
                 </p>
-                <p className="font-semibold text-red-500 mb-4">
-                  These variables are case sensitive
+                <p className="font-semibold text-rose-500 mb-4 text-[11px]">
+                  * Variables are case sensitive
                 </p>
 
-                <div className="border rounded overflow-hidden">
-                  <table className="w-full text-left border-collapse">
-                    <tbody>
-                      <tr className="border-b">
-                        <td className="p-2.5 font-bold text-gray-800 w-1/3">ClientCode</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                <div className="border border-slate-200/80 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <tbody className="divide-y divide-slate-100">
+                      <tr>
+                        <td className="p-2.5 font-semibold text-slate-800 w-1/3 bg-slate-50/50">ClientCode</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
                           <span>{`{{CLIENTKEY}}`}</span>
-                          <button onClick={() => copyToClipboard('{{CLIENTKEY}}', 'lc1')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lc1' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="border-b bg-gray-50/50">
-                        <td className="p-2.5 font-bold text-gray-800">ID</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
-                          <span>{`{{ID}}`}</span>
-                          <button onClick={() => copyToClipboard('{{ID}}', 'lc2')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lc2' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="border-b">
-                        <td className="p-2.5 font-bold text-gray-800">Ext</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
-                          <span>{`{{PASSTHRU}}`}</span>
-                          <button onClick={() => copyToClipboard('{{PASSTHRU}}', 'lc3')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lc3' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="border-b bg-gray-50/50">
-                        <td className="p-2.5 font-bold text-gray-800">Re Connect ID</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
-                          <span>{`{{RECONNECTID}}`}</span>
-                          <button onClick={() => copyToClipboard('{{RECONNECTID}}', 'lc4')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lc4' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="border-b">
-                        <td className="p-2.5 font-bold text-gray-800">Zip</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
-                          <span>{`{{Zip}}`}</span>
-                          <button onClick={() => copyToClipboard('{{Zip}}', 'lc5')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lc5' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="border-b bg-gray-50/50">
-                        <td className="p-2.5 font-bold text-gray-800">Age</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
-                          <span>{`{{Age}}`}</span>
-                          <button onClick={() => copyToClipboard('{{Age}}', 'lc6')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lc6' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="border-b">
-                        <td className="p-2.5 font-bold text-gray-800">Gender</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
-                          <span>{`{{Gender}}`}</span>
-                          <button onClick={() => copyToClipboard('{{Gender}}', 'lc7')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lc7' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          <button onClick={() => copyToClipboard('{{CLIENTKEY}}', 'lc1')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lc1' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
                           </button>
                         </td>
                       </tr>
                       <tr>
-                        <td className="p-2.5 font-bold text-gray-800">authToken</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                        <td className="p-2.5 font-semibold text-slate-800 bg-slate-50/50">ID</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
+                          <span>{`{{ID}}`}</span>
+                          <button onClick={() => copyToClipboard('{{ID}}', 'lc2')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lc2' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2.5 font-semibold text-slate-800 bg-slate-50/50">Ext</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
+                          <span>{`{{PASSTHRU}}`}</span>
+                          <button onClick={() => copyToClipboard('{{PASSTHRU}}', 'lc3')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lc3' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2.5 font-semibold text-slate-800 bg-slate-50/50">Re Connect ID</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
+                          <span>{`{{RECONNECTID}}`}</span>
+                          <button onClick={() => copyToClipboard('{{RECONNECTID}}', 'lc4')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lc4' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2.5 font-semibold text-slate-800 bg-slate-50/50">Zip</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
+                          <span>{`{{Zip}}`}</span>
+                          <button onClick={() => copyToClipboard('{{Zip}}', 'lc5')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lc5' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2.5 font-semibold text-slate-800 bg-slate-50/50">Age</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
+                          <span>{`{{Age}}`}</span>
+                          <button onClick={() => copyToClipboard('{{Age}}', 'lc6')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lc6' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2.5 font-semibold text-slate-800 bg-slate-50/50">Gender</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
+                          <span>{`{{Gender}}`}</span>
+                          <button onClick={() => copyToClipboard('{{Gender}}', 'lc7')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lc7' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2.5 font-semibold text-slate-800 bg-slate-50/50">authToken</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
                           <span>{`{{authToken}}`}</span>
-                          <button onClick={() => copyToClipboard('{{authToken}}', 'lc8')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lc8' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          <button onClick={() => copyToClipboard('{{authToken}}', 'lc8')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lc8' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
                           </button>
                         </td>
                       </tr>
@@ -744,41 +841,41 @@ function EditProjectForm() {
 
               {/* Right Column: Vendor Link Variable */}
               <div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">Vendor Link Variable</h4>
-                <p className="text-gray-600 mb-2 leading-relaxed">
-                  These variables shall be used only with vendor endpages.The values shall be replaced in end pages and then passed to vendor end pages.
+                <h4 className="text-base font-bold text-slate-900 mb-1.5">Vendor Link Variable</h4>
+                <p className="text-slate-500 mb-2 leading-relaxed text-[11px]">
+                  These variables shall be used only with vendor endpages. Values are substituted dynamically upon redirect.
                 </p>
-                <p className="font-semibold text-red-500 mb-4">
-                  These variables are case sensitive
+                <p className="font-semibold text-rose-500 mb-4 text-[11px]">
+                  * Variables are case sensitive
                 </p>
 
-                <div className="border rounded overflow-hidden">
-                  <table className="w-full text-left border-collapse">
-                    <tbody>
-                      <tr className="border-b">
-                        <td className="p-2.5 font-bold text-gray-800 w-1/3">Ext</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                <div className="border border-slate-200/80 rounded-xl overflow-hidden shadow-xs">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <tbody className="divide-y divide-slate-100">
+                      <tr>
+                        <td className="p-2.5 font-semibold text-slate-800 w-1/3 bg-slate-50/50">Ext</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
                           <span>{`{{PASSTHRU}}`}</span>
-                          <button onClick={() => copyToClipboard('{{PASSTHRU}}', 'lv1')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lv1' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-                          </button>
-                        </td>
-                      </tr>
-                      <tr className="border-b bg-gray-50/50">
-                        <td className="p-2.5 font-bold text-gray-800">Re Connect ID</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
-                          <span>{`{{RECONNECTID}}`}</span>
-                          <button onClick={() => copyToClipboard('{{RECONNECTID}}', 'lv2')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lv2' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          <button onClick={() => copyToClipboard('{{PASSTHRU}}', 'lv1')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lv1' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
                           </button>
                         </td>
                       </tr>
                       <tr>
-                        <td className="p-2.5 font-bold text-gray-800">Panellist ID</td>
-                        <td className="p-2.5 text-gray-700 font-mono flex items-center justify-between">
+                        <td className="p-2.5 font-semibold text-slate-800 bg-slate-50/50">Re Connect ID</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
+                          <span>{`{{RECONNECTID}}`}</span>
+                          <button onClick={() => copyToClipboard('{{RECONNECTID}}', 'lv2')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lv2' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2.5 font-semibold text-slate-800 bg-slate-50/50">Panellist ID</td>
+                        <td className="p-2.5 text-slate-800 font-mono flex items-center justify-between">
                           <span>{`{{panellist_id}}`}</span>
-                          <button onClick={() => copyToClipboard('{{panellist_id}}', 'lv3')} className="text-gray-400 hover:text-blue-600">
-                            {copiedKey === 'lv3' ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                          <button onClick={() => copyToClipboard('{{panellist_id}}', 'lv3')} className="text-slate-400 hover:text-blue-600 p-1">
+                            {copiedKey === 'lv3' ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
                           </button>
                         </td>
                       </tr>
@@ -789,12 +886,12 @@ function EditProjectForm() {
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-50 px-6 py-3 border-t flex justify-end">
+            <div className="bg-slate-50 px-6 py-3.5 border-t border-slate-100 flex justify-end">
               <button 
                 onClick={() => setShowLinkCodesModal(false)}
-                className="bg-[#00b5ad] hover:bg-teal-600 text-white font-bold text-xs px-5 py-2 rounded shadow-sm transition"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-5 py-2 rounded-xl shadow-xs transition"
               >
-                Okay
+                Done
               </button>
             </div>
           </div>
@@ -803,13 +900,13 @@ function EditProjectForm() {
 
       {/* Redirect Status ID(s) Modal */}
       {showRedirectStatusModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-gray-200">
+        <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto border border-slate-200/80">
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b">
-              <h3 className="text-base font-bold text-gray-800">Redirect Status ID(s)</h3>
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+              <h3 className="text-sm font-bold text-slate-900">Redirect Status ID(s)</h3>
               <button 
-                className="text-gray-400 hover:text-gray-700 transition" 
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg transition" 
                 onClick={() => setShowRedirectStatusModal(false)}
               >
                 <X size={18} />
@@ -817,25 +914,25 @@ function EditProjectForm() {
             </div>
 
             {/* Body */}
-            <div className="p-6 text-sm text-gray-800 space-y-2 font-normal">
-              <div>6 : Completed</div>
-              <div>7 : Disqualified</div>
-              <div>8 : Quota FULL</div>
-              <div>9 : Redirected</div>
-              <div>10 : Rejected - Failed SECURITY</div>
-              <div>11 : Rejected - Inconsistency</div>
-              <div>12 : Rejected - Poor OPEN ENDS</div>
-              <div>13 : Rejected - Quality issues</div>
-              <div>14 : Rejected - Speeding</div>
-              <div>31 : Rejected - Blank Referrer</div>
-              <div>32 : Rejected - IP Mismatch</div>
+            <div className="p-6 text-xs text-slate-700 space-y-2 font-medium divide-y divide-slate-100">
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-blue-600 font-bold">6</span> <span>Completed</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-amber-600 font-bold">7</span> <span>Disqualified</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-purple-600 font-bold">8</span> <span>Quota FULL</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-blue-500 font-bold">9</span> <span>Redirected</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-rose-600 font-bold">10</span> <span>Rejected - Failed SECURITY</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-rose-600 font-bold">11</span> <span>Rejected - Inconsistency</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-rose-600 font-bold">12</span> <span>Rejected - Poor OPEN ENDS</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-rose-600 font-bold">13</span> <span>Rejected - Quality issues</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-rose-600 font-bold">14</span> <span>Rejected - Speeding</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-rose-600 font-bold">31</span> <span>Rejected - Blank Referrer</span></div>
+              <div className="pt-1.5 flex justify-between"><span className="font-mono text-rose-600 font-bold">32</span> <span>Rejected - IP Mismatch</span></div>
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-50 px-6 py-3 border-t flex justify-end">
+            <div className="bg-slate-50 px-6 py-3.5 border-t border-slate-100 flex justify-end">
               <button 
                 onClick={() => setShowRedirectStatusModal(false)}
-                className="bg-[#5c6e80] hover:bg-gray-700 text-white font-bold text-xs px-5 py-2 rounded shadow-sm transition"
+                className="bg-slate-700 hover:bg-slate-800 text-white font-semibold text-xs px-5 py-2 rounded-xl shadow-xs transition"
               >
                 Close
               </button>

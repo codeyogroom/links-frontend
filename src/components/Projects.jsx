@@ -106,7 +106,7 @@ function Projects() {
                     onClick={() => navigate(`/projects/${p._id}`)}
                     className="flex items-center text-blue-500 hover:text-blue-700 px-2 py-1 rounded text-xs transition-colors"
                   >
-                    <Edit size={14} className="mr-1"/> Edit
+                    <Edit size={14} className="mr-1"/> 
                   </button>
                 </td>
               </tr>

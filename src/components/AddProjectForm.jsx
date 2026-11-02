@@ -54,7 +54,12 @@ function AddProjectForm() {
           api.get('/admin/projects')
         ]);
         setStudyTypes(stRes.data || []);
-        setClients(compRes.data || []);
+        // Only include companies whose type is Client (or Both)
+        const clientOnly = (compRes.data || []).filter(c => {
+          const t = (c.companyType || '').trim().toLowerCase();
+          return t === 'client' || t === 'both' || t.includes('client');
+        });
+        setClients(clientOnly);
         setProjects(projRes.data || []);
       } catch (e) {
         console.error("Error fetching configs", e);

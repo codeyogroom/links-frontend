@@ -43,7 +43,12 @@ function ProjectSuppliers() {
         api.get('/admin/companies')
       ]);
       setSuppliers(suppRes.data || []);
-      setCompanies(compRes.data || []);
+      // Filter for suppliers (Vendor or Both)
+      const vendorOnly = (compRes.data || []).filter(c => {
+        const t = (c.companyType || '').trim().toLowerCase();
+        return t === 'vendor' || t === 'both' || t.includes('vendor');
+      });
+      setCompanies(vendorOnly.length > 0 ? vendorOnly : (compRes.data || []));
     } catch (e) {
       console.error(e);
     } finally {

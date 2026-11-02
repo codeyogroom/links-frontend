@@ -37,6 +37,7 @@ function EditProjectForm() {
   // Dropdown options
   const [studyTypes, setStudyTypes] = useState([]);
   const [clients, setClients] = useState([]);
+  const [allContacts, setAllContacts] = useState([]);
   const [allProjects, setAllProjects] = useState([]);
 
   // Project Stats State
@@ -74,14 +75,21 @@ function EditProjectForm() {
   useEffect(() => {
     const fetchConfigs = async () => {
       try {
-        const [stRes, compRes, projRes] = await Promise.all([
+        const [stRes, compRes, projRes, contactRes] = await Promise.all([
           api.get('/admin/study-types'),
           api.get('/admin/companies'),
-          api.get('/admin/projects')
+          api.get('/admin/projects'),
+          api.get('/admin/contacts').catch(() => ({ data: [] }))
         ]);
-        setStudyTypes(stRes.data);
-        setClients(compRes.data);
-        setAllProjects(projRes.data);
+        setStudyTypes(stRes.data || []);
+        // Only include companies whose type is Client (or Both)
+        const clientOnly = (compRes.data || []).filter(c => {
+          const t = (c.companyType || '').trim().toLowerCase();
+          return t === 'client' || t === 'both' || t.includes('client');
+        });
+        setClients(clientOnly);
+        setAllProjects(projRes.data || []);
+        setAllContacts(contactRes?.data || []);
       } catch (e) {
         console.error("Error fetching configs", e);
       }
@@ -347,7 +355,28 @@ function EditProjectForm() {
                       {clients.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                     </select>
                   </div>
-                  <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Client Contact</label><select name="clientContactId" value={formData.clientContactId} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option value="">Select Client Contact</option></select></div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Client Contact</label>
+                    <select 
+                      name="clientContactId" 
+                      value={formData.clientContactId} 
+                      onChange={handleChange} 
+                      className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    >
+                      <option value="">Select Client Contact</option>
+                      {allContacts
+                        .filter(ct => {
+                          const cId = ct.companyId?._id || ct.companyId;
+                          return !formData.clientId || (cId && cId.toString() === formData.clientId.toString());
+                        })
+                        .map(ct => (
+                          <option key={ct._id} value={ct._id}>
+                            {ct.firstName} {ct.lastName} {ct.email ? `(${ct.email})` : ''}
+                          </option>
+                        ))
+                      }
+                    </select>
+                  </div>
                   <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Project Manager</label><select name="projectManager" value={formData.projectManager} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option>Admin TTP</option></select></div>
                   <div><label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Sales Person</label><select name="salesPerson" value={formData.salesPerson} onChange={handleChange} className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"><option>Admin TTP</option></select></div>
                 </div>

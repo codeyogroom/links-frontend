@@ -129,7 +129,7 @@ function EditProjectForm() {
       } catch (e) { console.error("Error fetching project data", e); }
     };
     
-    if (id) fetchProjectAndStats();
+    if (id && id.length === 24) fetchProjectAndStats();
   }, [id]);
 
   const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));

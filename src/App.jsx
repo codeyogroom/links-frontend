@@ -72,6 +72,7 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/add-project" element={<AddProjectForm />} />
+                <Route path="/projects/new" element={<AddProjectForm />} />
                 
                 {/* Nested Project Routes */}
                 <Route path="/projects/:id" element={<ProjectTabsLayout />}>

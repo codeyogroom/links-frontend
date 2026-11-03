@@ -26,7 +26,7 @@ function ProjectTabsLayout() {
   };
 
   useEffect(() => {
-    if (id) {
+    if (id && id.length === 24) {
       setLoading(true);
       fetchProject();
     }
